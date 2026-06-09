@@ -1,0 +1,10 @@
+{
+  "manifest_version": 3,
+  "name": "Synapse Clipper",
+  "version": "1.0",
+  "description": "Save websites and create media directly to your Synapse brain.",
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "permissions": ["activeTab"]
+}
