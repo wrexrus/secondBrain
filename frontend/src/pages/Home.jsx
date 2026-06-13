@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import AuthModal from '../AuthModal';
 import '../index.css';
 
 // ==========================================
@@ -51,19 +50,10 @@ const BRAIN_EDGES = [
 
 const Home = () => {
   const [isActive, setIsActive] = useState(false);
-  const [authModalState, setAuthModalState] = useState({ isOpen: false, mode: 'login' });
   const navigate = useNavigate();
 
   const handleBrainClick = () => {
     setIsActive(!isActive);
-  };
-
-  const openAuthModal = (mode) => {
-    setAuthModalState({ isOpen: true, mode });
-  };
-
-  const closeAuthModal = () => {
-    setAuthModalState({ ...authModalState, isOpen: false });
   };
 
   return (
@@ -71,8 +61,8 @@ const Home = () => {
       <header className="header">
         <h1 className="title">Synapse</h1>
         <div className="auth-container">
-          <button className="btn btn-outline" onClick={() => openAuthModal('login')}>Log in</button>
-          <button className="btn btn-primary" onClick={() => openAuthModal('signup')}>Sign up</button>
+          <button className="btn btn-outline" onClick={() => navigate('/login')}>Log in</button>
+          <button className="btn btn-primary" onClick={() => navigate('/signup')}>Sign up</button>
         </div>
       </header>
 
@@ -162,13 +152,6 @@ const Home = () => {
       <button className="doodle-btn" aria-label="Open Doodle Mode" onClick={() => navigate('/doodle')}>
         ✏️ Doodle
       </button>
-
-      {/* Authentication Modal */}
-      <AuthModal 
-        isOpen={authModalState.isOpen} 
-        initialMode={authModalState.mode} 
-        onClose={closeAuthModal} 
-      />
     </>
   );
 };

@@ -1,4 +1,4 @@
-const server = require("express");
+const express = require("express");
 const mongoose = require("mongoose")
 const dotenv = require("dotenv")
 const cors = require("cors")
@@ -16,3 +16,6 @@ app.get("/",(req,res)=>{
     res.send("Backend running");
 });
 
+app.listen(5000,()=>{
+    console.log("backend running!");
+})
