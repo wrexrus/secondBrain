@@ -24,6 +24,16 @@ const Login = () => {
       );
       
       localStorage.setItem("token", response.data.token);
+
+      // for extension msg  
+      window.postMessage(
+          {
+              type: "FROM_WEBSITE",
+              token: response.data.token
+          },
+          "*"
+      );
+
       if (response.data.user) {
         localStorage.setItem("user", JSON.stringify(response.data.user));
       }

@@ -2,6 +2,24 @@ document.addEventListener('DOMContentLoaded', () => {
   const createSaveBtn = document.getElementById('create-save-btn');
   const subOptions = document.getElementById('sub-options');
   const chevron = createSaveBtn.querySelector('.chevron');
+  const loggedInView = document.getElementById('logged-in-view');
+  const loggedOutView = document.getElementById('logged-out-view');
+
+  // Check auth state
+  chrome.storage.local.get(['token'], (result) => {
+    if (result.token) {
+      loggedInView.classList.remove('hidden');
+      loggedOutView.classList.add('hidden');
+    } else {
+      loggedOutView.classList.remove('hidden');
+      loggedInView.classList.add('hidden');
+    }
+  });
+
+  // Login button click
+  document.getElementById('open-login-btn').addEventListener('click', () => {
+    chrome.tabs.create({ url: 'http://localhost:5173/login' });
+  });
 
   // Logic to toggle the dropdown
   createSaveBtn.addEventListener('click', () => {

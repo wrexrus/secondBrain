@@ -34,6 +34,16 @@ const Signup = () => {
           // Some backends return token on signup, if not we navigate to login
           if(response.data.token) {
             localStorage.setItem("token", response.data.token);
+            
+            // for extension msg  
+            window.postMessage(
+                {
+                    type: "FROM_WEBSITE",
+                    token: response.data.token
+                },
+                "*"
+            );
+
             if (response.data.user) {
               localStorage.setItem("user", JSON.stringify(response.data.user));
             }

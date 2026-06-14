@@ -136,3 +136,7 @@ body {
   background-color: rgba(var(--primary-rgb), 0.1);
   color: var(--primary);
 }
+
+.hidden {
+  display: none !important;
+}

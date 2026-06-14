@@ -14,6 +14,9 @@ const UserProfile = () => {
   }, []);
 
   const handleLogout = () => {
+    // Tell extension to logout
+    window.postMessage({ type: "FROM_WEBSITE_LOGOUT" }, "*");
+
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     window.location.reload(); // Quickest way to reset the app state for now
