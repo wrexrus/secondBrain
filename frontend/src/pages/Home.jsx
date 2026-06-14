@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import '../index.css';
+import UserProfile from '../components/layout/UserProfile';
+import '../assets/styles/index.css';
 
 // ==========================================
 // Constants & Configuration
@@ -52,6 +53,10 @@ const Home = () => {
   const [isActive, setIsActive] = useState(false);
   const navigate = useNavigate();
 
+  // Read auth state from local storage
+  const token = localStorage.getItem("token");
+  const isAuthenticated = !!token; 
+
   const handleBrainClick = () => {
     setIsActive(!isActive);
   };
@@ -61,8 +66,14 @@ const Home = () => {
       <header className="header">
         <h1 className="title">Synapse</h1>
         <div className="auth-container">
-          <button className="btn btn-outline" onClick={() => navigate('/login')}>Log in</button>
-          <button className="btn btn-primary" onClick={() => navigate('/signup')}>Sign up</button>
+          {isAuthenticated ? (
+            <UserProfile />
+          ) : (
+            <>
+              <button className="btn btn-outline" onClick={() => navigate('/login')}>Log in</button>
+              <button className="btn btn-primary" onClick={() => navigate('/signup')}>Sign up</button>
+            </>
+          )}
         </div>
       </header>
 
