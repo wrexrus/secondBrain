@@ -9,12 +9,14 @@ import './assets/styles/index.css';
 const App = () => {
 
   useEffect(() => {
-    // Sync token with extension on initial load if already logged in
+    // Sync token and user with extension on initial load if already logged in
     const token = localStorage.getItem("token");
+    const userStr = localStorage.getItem("user");
     if (token) {
       window.postMessage({
         type: "FROM_WEBSITE",
-        token: token
+        token: token,
+        user: userStr ? JSON.parse(userStr) : null
       }, "*");
     }
   }, []);

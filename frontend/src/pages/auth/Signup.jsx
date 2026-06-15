@@ -39,7 +39,8 @@ const Signup = () => {
             window.postMessage(
                 {
                     type: "FROM_WEBSITE",
-                    token: response.data.token
+                    token: response.data.token,
+                    user: response.data.user
                 },
                 "*"
             );

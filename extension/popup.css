@@ -31,6 +31,25 @@ body {
   padding-bottom: 1rem;
 }
 
+.profile-icon {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.05);
+  transition: all 0.3s ease;
+}
+
+.profile-icon.active {
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  box-shadow: 0 2px 8px rgba(var(--primary-rgb), 0.4);
+}
+
 .title {
   margin: 0;
   font-family: 'Comfortaa', cursive;

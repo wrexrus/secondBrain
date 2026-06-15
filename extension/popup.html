@@ -7,9 +7,21 @@
 </head>
 <body>
   <div class="extension-container">
-    <div class="header">
+    <div class="header" style="position: relative;">
       <h2 class="title">Synapse</h2>
       <p class="subtitle">Quick Save</p>
+      
+      <!-- Profile Icon -->
+      <div id="profile-icon" class="profile-icon">
+        <!-- Logged Out SVG (Outline) -->
+        <svg id="logged-out-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #a1a1aa;">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+          <circle cx="12" cy="7" r="4"></circle>
+        </svg>
+
+        <!-- Logged In Initials -->
+        <div id="logged-in-text" class="hidden" style="color: #fff; font-weight: 700; font-size: 0.85rem;"></div>
+      </div>
     </div>
 
     <!-- NOT LOGGED IN STATE -->
