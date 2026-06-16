@@ -18,6 +18,11 @@ const App = () => {
         token: token,
         user: userStr ? JSON.parse(userStr) : null
       }, "*");
+    } else {
+      // Force sync a logout if the website has no token (e.g. token expired, cache cleared)
+      window.postMessage({
+        type: "FROM_WEBSITE_LOGOUT"
+      }, "*");
     }
   }, []);
 

@@ -3,7 +3,8 @@
   "name": "Synapse Clipper",
   "version": "1.0",
   "permissions": [
-    "storage"
+    "storage",
+    "activeTab"
   ],
   "host_permissions": [
     "http://localhost:5173/*",

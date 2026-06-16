@@ -26,3 +26,10 @@ window.addEventListener("message", (event) => {
     }
 
 });
+
+// Listen for messages from the extension (like popup.js) and forward them to the React window
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    if (message.type === "REFRESH_CATEGORIES") {
+        window.postMessage({ type: "REFRESH_CATEGORIES" }, "*");
+    }
+});

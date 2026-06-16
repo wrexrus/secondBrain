@@ -14,23 +14,53 @@ document.addEventListener('DOMContentLoaded', () => {
     return name.substring(0, 1).toUpperCase();
   };
 
+  const saveFormView = document.getElementById('save-form-view');
+  const saveUrlInput = document.getElementById('save-url');
+  const cancelSaveBtn = document.getElementById('cancel-save-btn');
+  const submitSaveBtn = document.getElementById('submit-save-btn');
+
+  // Function to decode JWT and check if it's expired
+  const isTokenExpired = (token) => {
+    try {
+      const payloadBase64 = token.split('.')[1];
+      const decodedJson = JSON.parse(atob(payloadBase64));
+      // JWT exp is in seconds, Date.now() is in milliseconds
+      return (decodedJson.exp * 1000) < Date.now();
+    } catch (e) {
+      return true; // If we can't parse it, consider it invalid/expired
+    }
+  };
+
+  const setLoggedOutState = () => {
+    loggedOutView.classList.remove('hidden');
+    loggedInView.classList.add('hidden');
+    saveFormView.classList.add('hidden');
+    
+    profileIcon.classList.remove('active');
+    loggedOutIcon.classList.remove('hidden');
+    loggedInText.classList.add('hidden');
+  };
+
   // Check auth state
   chrome.storage.local.get(['token', 'user'], (result) => {
     if (result.token) {
-      loggedInView.classList.remove('hidden');
-      loggedOutView.classList.add('hidden');
-      
-      profileIcon.classList.add('active');
-      loggedInText.textContent = getInitials(result.user?.name);
-      loggedInText.classList.remove('hidden');
-      loggedOutIcon.classList.add('hidden');
+      if (isTokenExpired(result.token)) {
+        // Token exists but is expired. Clean up storage and show logged out state.
+        chrome.storage.local.remove(['token', 'user']);
+        setLoggedOutState();
+      } else {
+        // Token is valid
+        loggedInView.classList.remove('hidden');
+        loggedOutView.classList.add('hidden');
+        saveFormView.classList.add('hidden');
+        
+        profileIcon.classList.add('active');
+        loggedInText.textContent = getInitials(result.user?.name);
+        loggedInText.classList.remove('hidden');
+        loggedOutIcon.classList.add('hidden');
+      }
     } else {
-      loggedOutView.classList.remove('hidden');
-      loggedInView.classList.add('hidden');
-      
-      profileIcon.classList.remove('active');
-      loggedOutIcon.classList.remove('hidden');
-      loggedInText.classList.add('hidden');
+      setLoggedOutState();
     }
   });
 
@@ -55,10 +85,97 @@ document.addEventListener('DOMContentLoaded', () => {
     chevron.classList.toggle('open');
   });
 
-  // Mock UI events
+  // Show Save Form
   document.getElementById('save-website-btn').addEventListener('click', () => {
-    console.log("Saving Website...");
-    alert("Save Website clicked! (UI Only)");
+    loggedInView.classList.add('hidden');
+    saveFormView.classList.remove('hidden');
+
+    // Auto-fill the URL of the current active tab
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      if (tabs.length > 0) {
+        saveUrlInput.value = tabs[0].url;
+      }
+    });
+  });
+
+  // Cancel Save Form
+  cancelSaveBtn.addEventListener('click', () => {
+    saveFormView.classList.add('hidden');
+    loggedInView.classList.remove('hidden');
+    document.getElementById('save-category').value = "";
+    document.getElementById('save-content').value = "";
+  });
+
+  // Submit Save Form (Mock for now)
+  submitSaveBtn.addEventListener('click', () => {
+    const url = saveUrlInput.value;
+    const categoryInput = document.getElementById('save-category');
+    const category = categoryInput.value.trim();
+    const content = document.getElementById('save-content').value;
+
+    if (!category) {
+      categoryInput.focus();
+      // Optional: Add a quick red flash to indicate error
+      categoryInput.style.borderColor = "#ef4444";
+      setTimeout(() => categoryInput.style.borderColor = "", 1500);
+      return;
+    }
+
+    console.log("Saving Website Data:", { url, category, content });
+    
+    // Disable button to prevent double submission
+    submitSaveBtn.disabled = true;
+    submitSaveBtn.textContent = "Saving...";
+
+    chrome.storage.local.get(['token'], (result) => {
+      if (!result.token) return;
+
+      fetch('http://localhost:5000/api/websites/save', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${result.token}`
+        },
+        body: JSON.stringify({ url, category, content })
+      })
+      .then(response => {
+        if (!response.ok) throw new Error('Network response was not ok');
+        return response.json();
+      })
+      .then(data => {
+        // Quick UI feedback before closing/resetting
+        submitSaveBtn.textContent = "Saved!";
+        submitSaveBtn.style.backgroundColor = "#22c55e"; // Success green
+        
+        setTimeout(() => {
+          submitSaveBtn.textContent = "Save";
+          submitSaveBtn.style.backgroundColor = "";
+          submitSaveBtn.disabled = false;
+          saveFormView.classList.add('hidden');
+          loggedInView.classList.remove('hidden');
+          categoryInput.value = "";
+          document.getElementById('save-content').value = "";
+
+          // Notify the active tab to refresh its categories
+          chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+            if (tabs.length > 0) {
+              chrome.tabs.sendMessage(tabs[0].id, { type: "REFRESH_CATEGORIES" });
+            }
+          });
+        }, 1000);
+      })
+      .catch(error => {
+        console.error('Error saving website:', error);
+        submitSaveBtn.textContent = "Error!";
+        submitSaveBtn.style.backgroundColor = "#ef4444"; // Error red
+        
+        setTimeout(() => {
+          submitSaveBtn.textContent = "Save";
+          submitSaveBtn.style.backgroundColor = "";
+          submitSaveBtn.disabled = false;
+        }, 2000);
+      });
+    });
   });
 
   document.getElementById('create-image-btn').addEventListener('click', () => {

@@ -63,6 +63,23 @@
         </div>
       </div>
     </div>
+
+    <!-- SAVE FORM VIEW -->
+    <div id="save-form-view" class="hidden" style="display: flex; flex-direction: column; gap: 0.8rem;">
+      <div class="form-group">
+        <input type="text" id="save-category" class="form-control" placeholder="Category" required>
+      </div>
+      <div class="form-group">
+        <textarea id="save-content" class="form-control" placeholder="Content(optional)" rows="3" style="resize: none;"></textarea>
+      </div>
+      <div class="form-group">
+        <input type="text" id="save-url" class="form-control" placeholder="URL">
+      </div>
+      <div class="form-actions" style="display: flex; gap: 0.5rem; margin-top: 0.2rem;">
+        <button class="btn btn-outline" id="cancel-save-btn" style="flex: 1; padding: 0.6rem;">Cancel</button>
+        <button class="btn btn-primary" id="submit-save-btn" style="flex: 1; padding: 0.6rem;">Save</button>
+      </div>
+    </div>
   </div>
   <script src="popup.js"></script>
 </body>
