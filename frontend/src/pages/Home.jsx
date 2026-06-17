@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { isTokenValid } from '../App';
 import UserProfile from '../components/layout/UserProfile';
 import '../assets/styles/index.css';
 
@@ -50,7 +51,7 @@ const Home = () => {
 
   // Read auth state from local storage
   const token = localStorage.getItem("token");
-  const isAuthenticated = !!token; 
+  const isAuthenticated = token && isTokenValid(token);  
 
   useEffect(() => {
     if (isAuthenticated) {
