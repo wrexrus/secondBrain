@@ -27,10 +27,13 @@ router.post("/save", authMiddleware, async (req, res) => {
       return res.status(400).json({ message: "URL and Category are required" });
     }
 
+    const formattedCategory = category.trim();
+    const finalCategory = formattedCategory.charAt(0).toUpperCase() + formattedCategory.slice(1).toLowerCase();
+
     const newWebsite = new Website({
       user: req.user.id,
       url,
-      category: category.toLowerCase(), // Force lowercase to prevent ReadLater vs readLater duplicity
+      category: finalCategory,
       content
     });
 

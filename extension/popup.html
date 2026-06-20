@@ -67,7 +67,8 @@
     <!-- SAVE FORM VIEW -->
     <div id="save-form-view" class="hidden" style="display: flex; flex-direction: column; gap: 0.8rem;">
       <div class="form-group">
-        <input type="text" id="save-category" class="form-control" placeholder="Category" required>
+        <input type="text" id="save-category" class="form-control" placeholder="Category" list="category-options" required>
+        <datalist id="category-options"></datalist>
       </div>
       <div class="form-group">
         <textarea id="save-content" class="form-control" placeholder="Content(optional)" rows="3" style="resize: none;"></textarea>

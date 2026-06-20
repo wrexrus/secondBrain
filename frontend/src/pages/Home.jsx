@@ -123,6 +123,10 @@ const Home = () => {
   };
 
   const handleBrainClick = () => {
+    if (!isAuthenticated) {
+      alert("Please login to activate Synapse and save your data!");
+      return;
+    }
     setIsActive(!isActive);
   };
 
@@ -287,7 +291,7 @@ const Home = () => {
                     transform: `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`
                   }}
                 >
-                  <span style={{ textTransform: 'capitalize' }}>{catName}</span>
+                  <span style={{ fontWeight: '500' }}>{catName}</span>
                 </div>
               );
             })}
@@ -309,6 +313,7 @@ const Home = () => {
             >
               <button 
                 className="btn btn-primary" 
+                onClick={() => alert("Manual Category Creation coming soon! (We put this on hold earlier)")}
                 style={{ 
                   padding: '0.4rem 1.2rem', 
                   fontSize: '0.9rem', 

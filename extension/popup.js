@@ -85,10 +85,46 @@ document.addEventListener('DOMContentLoaded', () => {
     chevron.classList.toggle('open');
   });
 
+  let cachedCategories = [];
+  const fetchCategoriesForDropdown = (token) => {
+    fetch('http://localhost:5000/api/websites/categories', {
+      headers: { 'Authorization': `Bearer ${token}` }
+    })
+    .then(res => res.json())
+    .then(categories => {
+      cachedCategories = categories;
+    })
+    .catch(err => console.error('Error fetching categories for dropdown:', err));
+  };
+
+  const categoryInput = document.getElementById('save-category');
+  const datalist = document.getElementById('category-options');
+
+  categoryInput.addEventListener('input', (e) => {
+    const val = e.target.value.toLowerCase();
+    datalist.innerHTML = ''; // Clear previous options
+    
+    if (val.length > 0) {
+      cachedCategories.forEach(cat => {
+        if (cat.toLowerCase().startsWith(val)) {
+          const option = document.createElement('option');
+          option.value = cat;
+          datalist.appendChild(option);
+        }
+      });
+    }
+  });
+
   // Show Save Form
   document.getElementById('save-website-btn').addEventListener('click', () => {
     loggedInView.classList.add('hidden');
     saveFormView.classList.remove('hidden');
+
+    chrome.storage.local.get(['token'], (result) => {
+      if (result.token) {
+        fetchCategoriesForDropdown(result.token);
+      }
+    });
 
     // Auto-fill the URL of the current active tab
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
@@ -156,11 +192,11 @@ document.addEventListener('DOMContentLoaded', () => {
           categoryInput.value = "";
           document.getElementById('save-content').value = "";
 
-          // Notify the active tab to refresh its categories
-          chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-            if (tabs.length > 0) {
-              chrome.tabs.sendMessage(tabs[0].id, { type: "REFRESH_CATEGORIES" });
-            }
+          // Notify ALL open Synapse React tabs to refresh their categories
+          chrome.tabs.query({ url: "*://localhost:5173/*" }, (tabs) => {
+            tabs.forEach(tab => {
+              chrome.tabs.sendMessage(tab.id, { type: "REFRESH_CATEGORIES" });
+            });
           });
         }, 1000);
       })
