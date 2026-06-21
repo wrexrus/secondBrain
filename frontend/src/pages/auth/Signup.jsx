@@ -16,6 +16,28 @@ const Signup = () => {
     e.preventDefault();
     setMessage({ text: '', type: '' }); // Clear old messages
     
+    // --- Regex Validations ---
+    // Name: Must contain at least one letter (cannot be purely numbers/symbols)
+    if (!/[a-zA-Z]/.test(name)) {
+      setMessage({ text: "Name must contain at least one letter.", type: "error" });
+      return;
+    }
+
+    // Email: Standard email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setMessage({ text: "Please enter a valid email address.", type: "error" });
+      return;
+    }
+
+    // Password: At least 8 characters, must contain at least one letter and one number
+    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
+    if (!passwordRegex.test(password)) {
+      setMessage({ text: "Password must be at least 8 characters long and contain a mix of letters and numbers.", type: "error" });
+      return;
+    }
+    // -------------------------
+
     try {
         const response = await axios.post(
             `${BASE_URL}/api/auth/signup`,

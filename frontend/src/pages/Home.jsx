@@ -9,6 +9,8 @@ import '../assets/styles/index.css';
 // Constants & Configuration
 // ==========================================
 
+const DUMMY_CATEGORIES = ["Ideas", "Inspiration", "Tech", "Design", "Fitness", "Recipes", "Books", "Travel"];
+
 const BRAIN_NODES = [
   { id: 1, x: 200, y: 50, r: 8 },
   { id: 2, x: 120, y: 80, r: 6 },
@@ -47,6 +49,16 @@ const Home = () => {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [websites, setWebsites] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  
+  // Feedback Form State
+  const [feedback, setFeedback] = useState({ name: '', email: '', message: '' });
+  const [feedbackStatus, setFeedbackStatus] = useState('');
+
+  // Manual Creation State
+  const [isCreatingCategory, setIsCreatingCategory] = useState(false);
+  const [newWebsite, setNewWebsite] = useState({ category: '', url: '', content: '' });
+  const [websiteSuggestions, setWebsiteSuggestions] = useState([]);
+
   const navigate = useNavigate();
 
   // Read auth state from local storage
@@ -56,6 +68,8 @@ const Home = () => {
   useEffect(() => {
     if (isAuthenticated) {
       fetchCategories();
+    } else {
+      setCategories(DUMMY_CATEGORIES);
     }
 
     const handleMessage = (event) => {
@@ -123,16 +137,77 @@ const Home = () => {
   };
 
   const handleBrainClick = () => {
+    setIsActive(!isActive);
+  };
+
+  const handleNewCategoryClick = (e) => {
+    e.stopPropagation();
     if (!isAuthenticated) {
-      alert("Please login to activate Synapse and save your data!");
+      alert("LogIn to create new Category!");
       return;
     }
-    setIsActive(!isActive);
+    setIsCreatingCategory(true);
+  };
+
+  const handleCreateSubmit = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    try {
+      await axios.post('http://localhost:5000/api/websites/save', newWebsite, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setIsCreatingCategory(false);
+      setNewWebsite({ category: '', url: '', content: '' });
+      fetchCategories(); 
+    } catch (err) {
+      alert("Error saving category.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleCategoryInputChange = (e) => {
+    const val = e.target.value;
+    
+    let formattedVal = val;
+    if (val.length > 0) {
+      formattedVal = val.charAt(0).toUpperCase() + val.slice(1).toLowerCase();
+    }
+    
+    setNewWebsite({ ...newWebsite, category: formattedVal });
+
+    if (val.length > 0) {
+      const matches = categories.filter(c => c.toLowerCase().startsWith(val.toLowerCase()));
+      setWebsiteSuggestions(matches);
+    } else {
+      setWebsiteSuggestions([]);
+    }
+  };
+
+  const handleFeedbackSubmit = async (e) => {
+    e.preventDefault();
+    setFeedbackStatus('Submitting...');
+    try {
+      await axios.post('http://localhost:5000/api/feedback/submit', feedback);
+      setFeedbackStatus('Success! Thank you for the suggestion.');
+      setFeedback({ name: '', email: '', message: '' });
+      setTimeout(() => setFeedbackStatus(''), 3000);
+    } catch (err) {
+      setFeedbackStatus('Error submitting feedback. Please try again.');
+      setTimeout(() => setFeedbackStatus(''), 3000);
+    }
+  };
+
+  const getIndicatorText = () => {
+    if (!isAuthenticated) {
+      return isActive ? "LOG IN TO AWAKEN" : "CLICK TO INITIALIZE";
+    }
+    return isActive ? "ACTIVE" : "CLICK TO INITIALIZE";
   };
 
   return (
     <>
-      <header className="header">
+      <header className="header" style={{ position: 'absolute', top: 0, width: '100%', zIndex: 50 }}>
         <h1 className="title">Synapse</h1>
         <div className="auth-container">
           {isAuthenticated ? (
@@ -146,7 +221,8 @@ const Home = () => {
         </div>
       </header>
 
-      <main className="main-container">
+      {/* SECTION 1: The Hero (Brain) */}
+      <section className="hero-section">
         <div className="brain-wrapper">
           
           {selectedCategory && (
@@ -264,71 +340,134 @@ const Home = () => {
             </div>
           )}
 
-          {/* Outer Ring */}
-          <div className={`categories-ring ${isActive ? 'visible' : ''}`}>
-            <svg className="ring-svg" viewBox="0 0 800 800">
-              <ellipse cx="400" cy="400" rx="360" ry="260" className="category-circle-line" />
-            </svg>
-            
-            {/* Dynamic Categories Rendered Around the Ring */}
-            {categories.map((catName, i) => {
-              const rx = 360;
-              const ry = 260;
-              // Start at -90 (top) and spread evenly around the 360 degrees
-              const angle = -90 + (i * (360 / Math.max(categories.length, 1)));
-              const rad = (angle * Math.PI) / 180;
-              const x = Math.cos(rad) * rx;
-              const y = Math.sin(rad) * ry;
-
-              return (
-                <div 
-                  key={`category-${i}`} 
-                  className="category-item"
-                  onClick={() => handleCategoryClick(catName)}
-                  style={{
-                    '--x': `${x}px`,
-                    '--y': `${y}px`,
-                    transform: `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`
-                  }}
-                >
-                  <span style={{ fontWeight: '500' }}>{catName}</span>
-                </div>
-              );
-            })}
-            
-            {/* Top Action Elements */}
-            <div 
-              style={{
-                position: 'absolute',
-                top: '50%',
-                left: '50%',
-                transform: 'translate(-50%, calc(-50% - 300px))',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                gap: '0.6rem',
-                pointerEvents: 'auto',
-                zIndex: 10
-              }}
-            >
-              <button 
-                className="btn btn-primary" 
-                onClick={() => alert("Manual Category Creation coming soon! (We put this on hold earlier)")}
-                style={{ 
-                  padding: '0.4rem 1.2rem', 
-                  fontSize: '0.9rem', 
-                  boxShadow: '0 0 15px rgba(var(--primary-rgb), 0.6)' 
-                }}
-              >
-                New Category
-              </button>
-              <div style={{ color: 'var(--text-muted)', fontSize: '0.85rem', fontWeight: '500' }}>
-                Add with Extension
+          {isCreatingCategory && (
+            <div className="expansion-view" style={{ 
+              position: 'absolute', 
+              top: '50%', 
+              left: '50%', 
+              transform: 'translate(-50%, -50%)',
+              animation: 'fadeIn 0.3s ease-out', 
+              width: '90vw', 
+              maxWidth: '500px', 
+              background: 'rgba(28, 25, 23, 0.95)', 
+              backdropFilter: 'blur(16px)',
+              padding: '2.5rem', 
+              borderRadius: '24px', 
+              border: '1px solid rgba(var(--primary-rgb), 0.3)', 
+              boxShadow: '0 20px 40px rgba(0,0,0,0.8), 0 0 60px rgba(var(--primary-rgb), 0.15)',
+              zIndex: 100 
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '1rem' }}>
+                <h2 style={{ color: 'var(--text-color)', fontSize: '1.8rem', fontFamily: 'Comfortaa, cursive', fontWeight: '700' }}>
+                  New Category
+                </h2>
+                <button 
+                  className="modal-close" 
+                  onClick={() => setIsCreatingCategory(false)}
+                  style={{ position: 'relative', top: '0', right: '0' }}
+                >×</button>
               </div>
-            </div>
-          </div>
 
-          {/* Inner Element: The Brain */}
+              <form onSubmit={handleCreateSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                <div style={{ position: 'relative' }}>
+                  <input 
+                    type="text" 
+                    placeholder="Category (Name)" 
+                    className="feedback-input" 
+                    style={{ width: '100%', boxSizing: 'border-box' }}
+                    value={newWebsite.category}
+                    onChange={handleCategoryInputChange}
+                    required
+                  />
+                  {websiteSuggestions.length > 0 && (
+                    <div style={{
+                      position: 'absolute',
+                      top: '100%',
+                      left: 0,
+                      right: 0,
+                      background: 'rgba(41, 37, 36, 0.95)',
+                      border: '1px solid rgba(255,255,255,0.1)',
+                      borderRadius: '8px',
+                      marginTop: '0.3rem',
+                      maxHeight: '150px',
+                      overflowY: 'auto',
+                      zIndex: 10
+                    }}>
+                      {websiteSuggestions.map((sug, idx) => (
+                        <div 
+                          key={idx}
+                          style={{ padding: '0.8rem 1rem', cursor: 'pointer', borderBottom: '1px solid rgba(255,255,255,0.05)' }}
+                          onClick={() => {
+                            setNewWebsite({ ...newWebsite, category: sug });
+                            setWebsiteSuggestions([]);
+                          }}
+                          onMouseEnter={(e) => e.target.style.background = 'rgba(var(--primary-rgb), 0.2)'}
+                          onMouseLeave={(e) => e.target.style.background = 'transparent'}
+                        >
+                          {sug}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <input 
+                  type="url" 
+                  placeholder="URL (Optional, https://...)" 
+                  className="feedback-input" 
+                  style={{ width: '100%', boxSizing: 'border-box' }}
+                  value={newWebsite.url}
+                  onChange={(e) => setNewWebsite({ ...newWebsite, url: e.target.value })}
+                />
+                
+                <textarea 
+                  placeholder="Content (Optional)" 
+                  className="feedback-input" 
+                  style={{ width: '100%', boxSizing: 'border-box', resize: 'vertical' }}
+                  rows="3"
+                  value={newWebsite.content}
+                  onChange={(e) => setNewWebsite({ ...newWebsite, content: e.target.value })}
+                ></textarea>
+
+                <button type="submit" className="btn btn-primary" style={{ justifyContent: 'center', marginTop: '0.5rem' }} disabled={isLoading}>
+                  {isLoading ? 'Saving...' : 'Save Record'}
+                </button>
+              </form>
+            </div>
+          )}
+            
+            {/* Outer Ring */}
+            <div className={`categories-ring ${isActive ? 'visible' : ''}`}>
+              <svg className="ring-svg" viewBox="0 0 800 800">
+                <ellipse cx="400" cy="400" rx="360" ry="260" className="category-circle-line" />
+              </svg>
+            
+              {/* Dynamic Categories Rendered Around the Ring */}
+              {categories.map((catName, i) => {
+                const rx = 360;
+                const ry = 260;
+                const angle = -90 + (i * (360 / Math.max(categories.length, 1)));
+                const rad = (angle * Math.PI) / 180;
+                const x = Math.cos(rad) * rx;
+                const y = Math.sin(rad) * ry;
+
+                return (
+                  <div 
+                    key={`category-${i}`} 
+                    className="category-item"
+                    onClick={() => isAuthenticated ? handleCategoryClick(catName) : alert("Sign up to view inside this category!")}
+                    style={{
+                      '--x': `${x}px`,
+                      '--y': `${y}px`,
+                      transform: `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`
+                    }}
+                  >
+                    <span style={{ fontWeight: '500' }}>{catName}</span>
+                  </div>
+                );
+              })}
+            </div>
+
           <div className="brain-glow"></div>
           
           <div 
@@ -370,18 +509,177 @@ const Home = () => {
               ))}
             </svg>
             
+            {isActive && (
+              <div 
+                style={{
+                  position: 'absolute',
+                  top: '32%',
+                  left: '50%',
+                  transform: 'translate(-50%, -50%)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  pointerEvents: 'auto',
+                  zIndex: 30
+                }}
+              >
+                <button 
+                  className="new-category-btn" 
+                  onClick={handleNewCategoryClick}
+                  style={{ 
+                    padding: '0.6rem 1.4rem', 
+                    fontSize: '0.9rem', 
+                    fontWeight: '700',
+                    background: 'var(--primary)',
+                    border: '2px solid var(--primary)',
+                    color: '#fff',
+                    borderRadius: '30px',
+                    boxShadow: '0 0 20px rgba(var(--primary-rgb), 0.5)',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    fontFamily: 'Outfit, sans-serif'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = 'orange';
+                    e.currentTarget.style.boxShadow = '0 0 30px rgba(var(--primary-rgb), 0.8)';
+                    e.currentTarget.style.transform = 'scale(1.08)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = 'var(--primary)';
+                    e.currentTarget.style.boxShadow = '0 0 20px rgba(var(--primary-rgb), 0.5)';
+                    e.currentTarget.style.transform = 'scale(1)';
+                  }}
+                >
+                  + New Category
+                </button>
+              </div>
+            )}
+            
             <div className={`click-indicator ${isActive ? 'active' : ''}`}>
-              {isActive ? "SYSTEM ACTIVE" : "CLICK TO INITIALIZE"}
+              <span style={{ opacity: 0.8, letterSpacing: '2px', fontSize: '0.85rem' }}>
+                {getIndicatorText()}
+              </span>
             </div>
           </div>
-          
         </div>
-      </main>
 
-      {/* Floating Doodle Button uses router to navigate to /doodle */}
-      <button className="doodle-btn" aria-label="Open Doodle Mode" onClick={() => navigate('/doodle')}>
-        ✏️ Doodle
-      </button>
+        {/* Floating Doodle Button (Moved inside Hero Section) */}
+        <button className="doodle-btn" aria-label="Open Doodle Mode" onClick={() => navigate('/doodle')}>
+          ✏️ Doodle
+        </button>
+
+        {/* Bouncing Scroll Indicator */}
+        <div style={{ position: 'absolute', bottom: '40px', animation: 'bounce 2s infinite', opacity: 0.5 }}>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </div>
+      </section>
+
+      {/* SECTION 2: Tutorial */}
+      <section className="section-container" style={{ background: 'rgba(0,0,0,0.2)' }}>
+        <h2 className="section-title">How Synapse Works</h2>
+        <div className="tutorial-grid">
+          <div className="tutorial-steps">
+            <div className="step-card">
+              <div className="step-number">01</div>
+              <h3 style={{ fontSize: '1.2rem', marginBottom: '0.5rem' }}>Install the Extension</h3>
+              <p style={{ color: 'var(--text-muted)' }}>Get the Synapse Chrome extension to start saving instantly from any tab.</p>
+            </div>
+            <div className="step-card">
+              <div className="step-number">02</div>
+              <h3 style={{ fontSize: '1.2rem', marginBottom: '0.5rem' }}>Save & Tag</h3>
+              <p style={{ color: 'var(--text-muted)' }}>Click the extension, choose an intelligent category, and hit save. It's that fast.</p>
+            </div>
+            <div className="step-card">
+              <div className="step-number">03</div>
+              <h3 style={{ fontSize: '1.2rem', marginBottom: '0.5rem' }}>Watch it Grow</h3>
+              <p style={{ color: 'var(--text-muted)' }}>Open your dashboard and watch your glowing brain expand with your knowledge.</p>
+            </div>
+          </div>
+          <div className="tutorial-video">
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" style={{ color: 'var(--primary)', opacity: 0.5 }}><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+            <p style={{ position: 'absolute', bottom: '20px', color: 'var(--text-muted)', fontSize: '0.9rem' }}>Video Tutorial Placeholder</p>
+          </div>
+        </div>
+      </section>
+
+      {/* SECTION 3: Features */}
+      <section className="section-container">
+        <h2 className="section-title">Why use Synapse?</h2>
+        <div className="features-grid">
+          <div className="feature-card">
+            <div className="feature-icon">⚡</div>
+            <h3 className="feature-title">Lightning Fast</h3>
+            <p style={{ color: 'var(--text-muted)' }}>Save websites in less than a second without ever switching tabs.</p>
+          </div>
+          <div className="feature-card">
+            <div className="feature-icon">🧠</div>
+            <h3 className="feature-title">Visual Knowledge</h3>
+            <p style={{ color: 'var(--text-muted)' }}>Stop reading boring lists. Experience your saved data as an interactive neural network.</p>
+          </div>
+          <div className="feature-card">
+            <div className="feature-icon">🎯</div>
+            <h3 className="feature-title">Smart Tags</h3>
+            <p style={{ color: 'var(--text-muted)' }}>Intelligent autocomplete ensures you never misplace or duplicate a category again.</p>
+          </div>
+        </div>
+      </section>
+
+      {/* SECTION 4: Feedback Form */}
+      <section className="section-container" style={{ background: 'rgba(0,0,0,0.2)' }}>
+        <h2 className="section-title" style={{ marginBottom: '1rem' }}>Drop a Suggestion</h2>
+        <p style={{ color: 'var(--text-muted)', textAlign: 'center', marginBottom: '3rem' }}>Have an idea to make Synapse better? Let us know!</p>
+        
+        <div className="feedback-container">
+          <form className="feedback-form" onSubmit={handleFeedbackSubmit}>
+            <input 
+              type="text" 
+              className="feedback-input" 
+              placeholder="Your Name" 
+              required 
+              value={feedback.name}
+              onChange={(e) => setFeedback({...feedback, name: e.target.value})}
+            />
+            <input 
+              type="email" 
+              className="feedback-input" 
+              placeholder="Your Email" 
+              required 
+              value={feedback.email}
+              onChange={(e) => setFeedback({...feedback, email: e.target.value})}
+            />
+            <textarea 
+              className="feedback-input" 
+              placeholder="Your suggestion..." 
+              rows="4" 
+              required
+              value={feedback.message}
+              onChange={(e) => setFeedback({...feedback, message: e.target.value})}
+              style={{ resize: 'vertical' }}
+            ></textarea>
+            <button type="submit" className="btn btn-primary" style={{ justifyContent: 'center', marginTop: '1rem' }}>
+              Send Suggestion
+            </button>
+            {feedbackStatus && (
+              <p style={{ textAlign: 'center', color: feedbackStatus.includes('Error') ? '#ef4444' : '#4ade80', fontSize: '0.9rem', marginTop: '0.5rem' }}>
+                {feedbackStatus}
+              </p>
+            )}
+          </form>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="footer">
+        <div>
+          <h2 style={{ fontFamily: 'Comfortaa, cursive', fontSize: '1.5rem', marginBottom: '0.5rem' }}>Synapse</h2>
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Your digital second brain.</p>
+        </div>
+        <div className="footer-links">
+          <a href="#">Twitter</a>
+          <a href="#">Discord</a>
+          <a href="#">Privacy Policy</a>
+        </div>
+      </footer>
     </>
   );
 };

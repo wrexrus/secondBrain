@@ -23,8 +23,8 @@ router.post("/save", authMiddleware, async (req, res) => {
   try {
     const { url, category, content } = req.body;
     
-    if (!url || !category) {
-      return res.status(400).json({ message: "URL and Category are required" });
+    if (!category) {
+      return res.status(400).json({ message: "Category is required" });
     }
 
     const formattedCategory = category.trim();

@@ -7,8 +7,7 @@ const websiteSchema = new mongoose.Schema({
     required: true
   },
   url: {
-    type: String,
-    required: true
+    type: String
   },
   category: {
     type: String,

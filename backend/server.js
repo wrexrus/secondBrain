@@ -6,6 +6,7 @@ const PORT = process.env.PORT || 5000;
 const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
 const websiteRoutes = require("./routes/websiteRoutes");
+const feedbackRoutes = require("./routes/feedbackRoutes");
 
 dotenv.config();
 
@@ -29,6 +30,7 @@ mongoose.connect(process.env.MONGO_URI)
 app.use("/api/auth", authRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/websites", websiteRoutes);
+app.use("/api/feedback", feedbackRoutes);
 
 app.get("/",(req,res)=>{
     res.send("Backend running!!");
