@@ -36,9 +36,17 @@ body {
   display: flex;
   flex-direction: column;
   overflow-x: hidden;
+  user-select: none; /* Prevent text selection globally */
+  cursor: default;   /* Default arrow cursor */
   background-image: 
     radial-gradient(circle at 15% 50%, rgba(var(--secondary-rgb), 0.05), transparent 40%),
     radial-gradient(circle at 85% 30%, rgba(var(--primary-rgb), 0.08), transparent 40%);
+}
+
+/* Allow text selection in form elements */
+input, textarea {
+  user-select: text;
+  cursor: text;
 }
 
 #root {
@@ -769,16 +777,95 @@ body {
 }
 
 /* Responsive */
+@media (max-width: 1024px) {
+  .categories-ring.visible {
+    transform: translate(-50%, -50%) scale(0.8);
+  }
+}
+
 @media (max-width: 768px) {
+  .header {
+    padding: 1.5rem 0 1rem;
+  }
+  .auth-container {
+    position: relative;
+    top: 0;
+    right: 0;
+    justify-content: center;
+    margin-top: 1rem;
+  }
+
   .tutorial-grid {
     grid-template-columns: 1fr;
   }
   .section-title {
-    font-size: 2.5rem;
+    font-size: 2.2rem;
   }
+  .section-container {
+    padding: 4rem 1.5rem;
+  }
+  
   .footer {
     flex-direction: column;
     gap: 1.5rem;
     text-align: center;
+  }
+  
+  .brain-container {
+    transform: scale(0.8);
+  }
+  .brain-container:hover {
+    transform: scale(0.82);
+  }
+  .brain-container.active {
+    transform: scale(0.88);
+  }
+  
+  .categories-ring.visible {
+    transform: translate(-50%, -50%) scale(0.65);
+  }
+  .category-item {
+    font-size: 1.5rem !important; /* Counteract scale shrinking */
+    padding: 1rem 2rem !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .title {
+    font-size: 2.2rem;
+  }
+  .section-title {
+    font-size: 1.8rem;
+  }
+  
+  .brain-container {
+    transform: scale(0.65);
+  }
+  .brain-container:hover {
+    transform: scale(0.67);
+  }
+  .brain-container.active {
+    transform: scale(0.72);
+  }
+  
+  .categories-ring.visible {
+    transform: translate(-50%, -50%) scale(0.45);
+  }
+  .category-item {
+    font-size: 2rem !important; /* Counteract scale shrinking */
+    padding: 1.5rem 2.5rem !important;
+  }
+  
+  .feature-card {
+    padding: 1.5rem;
+  }
+  .feedback-container {
+    padding: 1.5rem;
+  }
+  .doodle-btn {
+    bottom: 1rem;
+    right: 1rem;
+    padding: 0.8rem 1.2rem;
+    font-size: 0.9rem;
   }
 }

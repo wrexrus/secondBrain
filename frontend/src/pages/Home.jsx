@@ -3,6 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { isTokenValid } from '../App';
 import UserProfile from '../components/layout/UserProfile';
+import TutorialSection from '../components/home/TutorialSection';
+import FeaturesSection from '../components/home/FeaturesSection';
+import FeedbackSection from '../components/home/FeedbackSection';
+import Footer from '../components/layout/Footer';
 import '../assets/styles/index.css';
 
 // ==========================================
@@ -49,10 +53,6 @@ const Home = () => {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [websites, setWebsites] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  
-  // Feedback Form State
-  const [feedback, setFeedback] = useState({ name: '', email: '', message: '' });
-  const [feedbackStatus, setFeedbackStatus] = useState('');
 
   // Manual Creation State
   const [isCreatingCategory, setIsCreatingCategory] = useState(false);
@@ -181,20 +181,6 @@ const Home = () => {
       setWebsiteSuggestions(matches);
     } else {
       setWebsiteSuggestions([]);
-    }
-  };
-
-  const handleFeedbackSubmit = async (e) => {
-    e.preventDefault();
-    setFeedbackStatus('Submitting...');
-    try {
-      await axios.post('http://localhost:5000/api/feedback/submit', feedback);
-      setFeedbackStatus('Success! Thank you for the suggestion.');
-      setFeedback({ name: '', email: '', message: '' });
-      setTimeout(() => setFeedbackStatus(''), 3000);
-    } catch (err) {
-      setFeedbackStatus('Error submitting feedback. Please try again.');
-      setTimeout(() => setFeedbackStatus(''), 3000);
     }
   };
 
@@ -574,112 +560,10 @@ const Home = () => {
         </div>
       </section>
 
-      {/* SECTION 2: Tutorial */}
-      <section className="section-container" style={{ background: 'rgba(0,0,0,0.2)' }}>
-        <h2 className="section-title">How Synapse Works</h2>
-        <div className="tutorial-grid">
-          <div className="tutorial-steps">
-            <div className="step-card">
-              <div className="step-number">01</div>
-              <h3 style={{ fontSize: '1.2rem', marginBottom: '0.5rem' }}>Install the Extension</h3>
-              <p style={{ color: 'var(--text-muted)' }}>Get the Synapse Chrome extension to start saving instantly from any tab.</p>
-            </div>
-            <div className="step-card">
-              <div className="step-number">02</div>
-              <h3 style={{ fontSize: '1.2rem', marginBottom: '0.5rem' }}>Save & Tag</h3>
-              <p style={{ color: 'var(--text-muted)' }}>Click the extension, choose an intelligent category, and hit save. It's that fast.</p>
-            </div>
-            <div className="step-card">
-              <div className="step-number">03</div>
-              <h3 style={{ fontSize: '1.2rem', marginBottom: '0.5rem' }}>Watch it Grow</h3>
-              <p style={{ color: 'var(--text-muted)' }}>Open your dashboard and watch your glowing brain expand with your knowledge.</p>
-            </div>
-          </div>
-          <div className="tutorial-video">
-            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" style={{ color: 'var(--primary)', opacity: 0.5 }}><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-            <p style={{ position: 'absolute', bottom: '20px', color: 'var(--text-muted)', fontSize: '0.9rem' }}>Video Tutorial Placeholder</p>
-          </div>
-        </div>
-      </section>
-
-      {/* SECTION 3: Features */}
-      <section className="section-container">
-        <h2 className="section-title">Why use Synapse?</h2>
-        <div className="features-grid">
-          <div className="feature-card">
-            <div className="feature-icon">⚡</div>
-            <h3 className="feature-title">Lightning Fast</h3>
-            <p style={{ color: 'var(--text-muted)' }}>Save websites in less than a second without ever switching tabs.</p>
-          </div>
-          <div className="feature-card">
-            <div className="feature-icon">🧠</div>
-            <h3 className="feature-title">Visual Knowledge</h3>
-            <p style={{ color: 'var(--text-muted)' }}>Stop reading boring lists. Experience your saved data as an interactive neural network.</p>
-          </div>
-          <div className="feature-card">
-            <div className="feature-icon">🎯</div>
-            <h3 className="feature-title">Smart Tags</h3>
-            <p style={{ color: 'var(--text-muted)' }}>Intelligent autocomplete ensures you never misplace or duplicate a category again.</p>
-          </div>
-        </div>
-      </section>
-
-      {/* SECTION 4: Feedback Form */}
-      <section className="section-container" style={{ background: 'rgba(0,0,0,0.2)' }}>
-        <h2 className="section-title" style={{ marginBottom: '1rem' }}>Drop a Suggestion</h2>
-        <p style={{ color: 'var(--text-muted)', textAlign: 'center', marginBottom: '3rem' }}>Have an idea to make Synapse better? Let us know!</p>
-        
-        <div className="feedback-container">
-          <form className="feedback-form" onSubmit={handleFeedbackSubmit}>
-            <input 
-              type="text" 
-              className="feedback-input" 
-              placeholder="Your Name" 
-              required 
-              value={feedback.name}
-              onChange={(e) => setFeedback({...feedback, name: e.target.value})}
-            />
-            <input 
-              type="email" 
-              className="feedback-input" 
-              placeholder="Your Email" 
-              required 
-              value={feedback.email}
-              onChange={(e) => setFeedback({...feedback, email: e.target.value})}
-            />
-            <textarea 
-              className="feedback-input" 
-              placeholder="Your suggestion..." 
-              rows="4" 
-              required
-              value={feedback.message}
-              onChange={(e) => setFeedback({...feedback, message: e.target.value})}
-              style={{ resize: 'vertical' }}
-            ></textarea>
-            <button type="submit" className="btn btn-primary" style={{ justifyContent: 'center', marginTop: '1rem' }}>
-              Send Suggestion
-            </button>
-            {feedbackStatus && (
-              <p style={{ textAlign: 'center', color: feedbackStatus.includes('Error') ? '#ef4444' : '#4ade80', fontSize: '0.9rem', marginTop: '0.5rem' }}>
-                {feedbackStatus}
-              </p>
-            )}
-          </form>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="footer">
-        <div>
-          <h2 style={{ fontFamily: 'Comfortaa, cursive', fontSize: '1.5rem', marginBottom: '0.5rem' }}>Synapse</h2>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Your digital second brain.</p>
-        </div>
-        <div className="footer-links">
-          <a href="#">Twitter</a>
-          <a href="#">Discord</a>
-          <a href="#">Privacy Policy</a>
-        </div>
-      </footer>
+      <TutorialSection />
+      <FeaturesSection />
+      <FeedbackSection />
+      <Footer />
     </>
   );
 };
