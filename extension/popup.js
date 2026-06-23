@@ -85,33 +85,53 @@ document.addEventListener('DOMContentLoaded', () => {
     chevron.classList.toggle('open');
   });
 
-  let cachedCategories = [];
-  const fetchCategoriesForDropdown = (token) => {
-    fetch('http://localhost:5000/api/websites/categories', {
+  let cachedMetadata = [];
+  const fetchMetadataForDropdown = (token) => {
+    fetch('http://localhost:5000/api/websites/metadata', {
       headers: { 'Authorization': `Bearer ${token}` }
     })
     .then(res => res.json())
-    .then(categories => {
-      cachedCategories = categories;
+    .then(data => {
+      cachedMetadata = data;
     })
-    .catch(err => console.error('Error fetching categories for dropdown:', err));
+    .catch(err => console.error('Error fetching metadata for dropdown:', err));
   };
 
   const categoryInput = document.getElementById('save-category');
-  const datalist = document.getElementById('category-options');
+  const categoryDatalist = document.getElementById('category-options');
+  const subCategoryInput = document.getElementById('save-subcategory');
+  const subCategoryDatalist = document.getElementById('subcategory-options');
 
   categoryInput.addEventListener('input', (e) => {
     const val = e.target.value.toLowerCase();
-    datalist.innerHTML = ''; // Clear previous options
+    categoryDatalist.innerHTML = ''; 
     
     if (val.length > 0) {
-      cachedCategories.forEach(cat => {
-        if (cat.toLowerCase().startsWith(val)) {
+      cachedMetadata.forEach(meta => {
+        if (meta.category.toLowerCase().startsWith(val)) {
           const option = document.createElement('option');
-          option.value = cat;
-          datalist.appendChild(option);
+          option.value = meta.category;
+          categoryDatalist.appendChild(option);
         }
       });
+    }
+  });
+
+  subCategoryInput.addEventListener('input', (e) => {
+    const val = e.target.value.toLowerCase();
+    subCategoryDatalist.innerHTML = ''; 
+    
+    if (val.length > 0 && categoryInput.value) {
+      const catMeta = cachedMetadata.find(m => m.category.toLowerCase() === categoryInput.value.toLowerCase());
+      if (catMeta && catMeta.subCategories) {
+        catMeta.subCategories.forEach(sub => {
+          if (sub.toLowerCase().startsWith(val)) {
+            const option = document.createElement('option');
+            option.value = sub;
+            subCategoryDatalist.appendChild(option);
+          }
+        });
+      }
     }
   });
 
@@ -122,7 +142,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     chrome.storage.local.get(['token'], (result) => {
       if (result.token) {
-        fetchCategoriesForDropdown(result.token);
+        fetchMetadataForDropdown(result.token);
       }
     });
 
@@ -139,14 +159,16 @@ document.addEventListener('DOMContentLoaded', () => {
     saveFormView.classList.add('hidden');
     loggedInView.classList.remove('hidden');
     document.getElementById('save-category').value = "";
+    document.getElementById('save-subcategory').value = "";
     document.getElementById('save-content').value = "";
   });
 
-  // Submit Save Form (Mock for now)
+  // Submit Save Form
   submitSaveBtn.addEventListener('click', () => {
     const url = saveUrlInput.value;
     const categoryInput = document.getElementById('save-category');
     const category = categoryInput.value.trim();
+    const subCategory = document.getElementById('save-subcategory').value.trim();
     const content = document.getElementById('save-content').value;
 
     if (!category) {
@@ -157,7 +179,7 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    console.log("Saving Website Data:", { url, category, content });
+    console.log("Saving Website Data:", { url, category, subCategory, content });
     
     // Disable button to prevent double submission
     submitSaveBtn.disabled = true;
@@ -172,7 +194,7 @@ document.addEventListener('DOMContentLoaded', () => {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${result.token}`
         },
-        body: JSON.stringify({ url, category, content })
+        body: JSON.stringify({ url, category, subCategory, content })
       })
       .then(response => {
         if (!response.ok) throw new Error('Network response was not ok');
@@ -190,6 +212,7 @@ document.addEventListener('DOMContentLoaded', () => {
           saveFormView.classList.add('hidden');
           loggedInView.classList.remove('hidden');
           categoryInput.value = "";
+          document.getElementById('save-subcategory').value = "";
           document.getElementById('save-content').value = "";
 
           // Notify ALL open Synapse React tabs to refresh their categories

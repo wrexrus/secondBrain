@@ -1,10 +1,15 @@
+const ALLOWED_ORIGINS = [
+  "http://localhost:5173",
+  "https://your-production-url.com" // REPLACE THIS ON DEPLOYMENT
+];
+
 window.addEventListener("message", (event) => {
 
     // safety check
     if (event.source !== window) return;
 
     // imp: Security check to block fake messages from malicious iframes/ads
-    if (event.origin !== "http://localhost:5173") return;
+    if (!ALLOWED_ORIGINS.includes(event.origin)) return;
 
     // check message type
     if (event.data.type === "FROM_WEBSITE") {
@@ -30,6 +35,6 @@ window.addEventListener("message", (event) => {
 // Listen for messages from the extension (like popup.js) and forward them to the React window
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.type === "REFRESH_CATEGORIES") {
-        window.postMessage({ type: "REFRESH_CATEGORIES" }, "*");
+        window.postMessage({ type: "REFRESH_CATEGORIES" }, window.location.origin);
     }
 });

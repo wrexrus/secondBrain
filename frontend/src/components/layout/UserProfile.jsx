@@ -15,7 +15,7 @@ const UserProfile = () => {
 
   const handleLogout = () => {
     // Tell extension to logout
-    window.postMessage({ type: "FROM_WEBSITE_LOGOUT" }, "*");
+    window.postMessage({ type: "FROM_WEBSITE_LOGOUT" }, window.location.origin);
 
     localStorage.removeItem('token');
     localStorage.removeItem('user');

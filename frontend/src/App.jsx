@@ -32,7 +32,7 @@ const App = () => {
         type: "FROM_WEBSITE",
         token: token,
         user: userStr ? JSON.parse(userStr) : null
-      }, "*");
+      }, window.location.origin);
     } else {
       if (token) {
         localStorage.removeItem("token");

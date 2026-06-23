@@ -64,7 +64,7 @@ const Signup = () => {
                     token: response.data.token,
                     user: response.data.user
                 },
-                "*"
+                window.location.origin
             );
 
             if (response.data.user) {

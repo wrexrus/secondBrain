@@ -27,6 +27,7 @@
   padding: 0;
   box-sizing: border-box;
   font-family: 'Outfit', sans-serif;
+  -webkit-user-drag: none;
 }
 
 body {
@@ -43,9 +44,12 @@ body {
     radial-gradient(circle at 85% 30%, rgba(var(--primary-rgb), 0.08), transparent 40%);
 }
 
-/* Allow text selection in form elements */
-input, textarea {
+/* Allow text selection in form elements and modals */
+input, textarea, .expansion-view {
   user-select: text;
+  -webkit-user-drag: auto;
+}
+input, textarea {
   cursor: text;
 }
 
@@ -391,7 +395,13 @@ input, textarea {
 }
 
 @keyframes fadeIn {
+  from { opacity: 0; }
   to { opacity: 1; }
+}
+
+@keyframes slowZoomFade {
+  0% { opacity: 0; transform: scale(0.97); }
+  100% { opacity: 1; transform: scale(1); }
 }
 
 .auth-card {
@@ -774,6 +784,22 @@ input, textarea {
 
 .footer-links a:hover {
   color: var(--primary);
+}
+
+/* Custom Scrollbar for Modals */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 10px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(var(--primary-rgb), 0.3);
+  border-radius: 10px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(var(--primary-rgb), 0.5);
 }
 
 /* Responsive */

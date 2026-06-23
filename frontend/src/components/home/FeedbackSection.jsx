@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import BASE_URL from '../../config/api';
 
 const FeedbackSection = () => {
   const [feedback, setFeedback] = useState({ name: '', email: '', message: '' });
@@ -9,7 +10,7 @@ const FeedbackSection = () => {
     e.preventDefault();
     setFeedbackStatus('Submitting...');
     try {
-      await axios.post('http://localhost:5000/api/feedback/submit', feedback);
+      await axios.post(`${BASE_URL}/api/feedback/submit`, feedback);
       setFeedbackStatus('Success! Thank you for the suggestion.');
       setFeedback({ name: '', email: '', message: '' });
       setTimeout(() => setFeedbackStatus(''), 3000);

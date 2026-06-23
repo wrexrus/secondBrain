@@ -32,7 +32,7 @@ const Login = () => {
               token: response.data.token,
               user: response.data.user
           },
-          "*"
+          window.location.origin
       );
 
       if (response.data.user) {
