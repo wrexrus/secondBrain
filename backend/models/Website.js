@@ -9,6 +9,10 @@ const websiteSchema = new mongoose.Schema({
   url: {
     type: String
   },
+  imagePath: {
+    type: String,
+    default: null
+  },
   category: {
     type: String,
     required: true,

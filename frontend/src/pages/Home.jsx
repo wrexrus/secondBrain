@@ -11,6 +11,14 @@ import FeaturesSection from '../components/home/FeaturesSection';
 import FeedbackSection from '../components/home/FeedbackSection';
 import Footer from '../components/layout/Footer';
 import GlobalSearch from '../components/home/GlobalSearch';
+import { 
+  fetchCategoriesApi, 
+  fetchMetadataApi, 
+  fetchWebsitesByCategoryApi, 
+  deleteWebsiteApi, 
+  saveWebsiteApi,
+  updateWebsiteApi
+} from '../services/api';
 import BASE_URL from '../config/api';
 import '../assets/styles/index.css';
 
@@ -99,15 +107,11 @@ const Home = () => {
 
   const fetchCategories = async () => {
     try {
-      const res = await axios.get(`${BASE_URL}/api/websites/categories`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setCategories(res.data);
+      const categoriesData = await fetchCategoriesApi(token);
+      setCategories(categoriesData);
       
-      const metaRes = await axios.get(`${BASE_URL}/api/websites/metadata`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setMetadata(metaRes.data);
+      const metadataData = await fetchMetadataApi(token);
+      setMetadata(metadataData);
     } catch (error) {
       console.error("Error fetching categories", error);
     }
@@ -116,10 +120,8 @@ const Home = () => {
   const fetchWebsitesByCategory = async (categoryName) => {
     setIsLoading(true);
     try {
-      const res = await axios.get(`${BASE_URL}/api/websites/${categoryName}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setWebsites(res.data);
+      const websitesData = await fetchWebsitesByCategoryApi(token, categoryName);
+      setWebsites(websitesData);
     } catch (error) {
       console.error("Error fetching websites", error);
     } finally {
@@ -129,9 +131,7 @@ const Home = () => {
 
   const handleDeleteWebsite = async (id) => {
     try {
-      await axios.delete(`${BASE_URL}/api/websites/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await deleteWebsiteApi(token, id);
       // Remove from local state immediately
       setWebsites(prev => prev.filter(site => site._id !== id));
       
@@ -142,6 +142,22 @@ const Home = () => {
       }
     } catch (error) {
       console.error("Error deleting website", error);
+    }
+  };
+
+  const handleUpdateWebsite = async (id, updatedData) => {
+    try {
+      const updatedSite = await updateWebsiteApi(token, id, updatedData);
+      setWebsites(prev => prev.map(site => site._id === id ? updatedSite : site));
+      // Refresh categories/metadata just in case the category changed
+      if (updatedData.category || updatedData.subCategory !== undefined) {
+        fetchCategories();
+      }
+      return true; // signal success
+    } catch (error) {
+      console.error("Error updating website", error);
+      alert("Error updating website");
+      return false;
     }
   };
 
@@ -173,9 +189,7 @@ const Home = () => {
     e.preventDefault();
     setIsLoading(true);
     try {
-      await axios.post(`${BASE_URL}/api/websites/save`, newWebsite, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await saveWebsiteApi(token, newWebsite);
       
       if (selectedCategory === newWebsite.category && newWebsite.subCategory) {
         setActiveSubCategory(newWebsite.subCategory);
@@ -240,6 +254,14 @@ const Home = () => {
     return isActive ? "ACTIVE" : "CLICK TO INITIALIZE";
   };
 
+  useEffect(() => {
+    if (selectedCategory || isCreatingCategory || isGlobalSearchOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+  }, [selectedCategory, isCreatingCategory, isGlobalSearchOpen]);
+
   return (
     <>
       <Header 
@@ -266,6 +288,7 @@ const Home = () => {
         handleCategoryClick={handleCategoryClick}
         handleBrainClick={handleBrainClick}
         getIndicatorText={getIndicatorText}
+        handleNewCategoryClick={handleNewCategoryClick}
       />
 
       {selectedCategory && (
@@ -276,6 +299,7 @@ const Home = () => {
           activeSubCategory={activeSubCategory}
           setActiveSubCategory={setActiveSubCategory}
           handleDeleteWebsite={handleDeleteWebsite}
+          handleUpdateWebsite={handleUpdateWebsite}
           closeExpansion={closeExpansion}
           setNewWebsite={setNewWebsite}
           setIsCreatingCategory={setIsCreatingCategory}

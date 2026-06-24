@@ -325,23 +325,25 @@ input, textarea {
   bottom: 5px;
   left: 50%;
   transform: translateX(-50%);
-  font-size: 0.95rem;
-  font-weight: 500;
+  font-size: 1.15rem;
+  font-weight: 700;
   color: var(--secondary);
-  letter-spacing: 0.15rem;
+  letter-spacing: 0.2rem;
   opacity: 0.8;
   animation: gentleBounce 2.5s infinite;
   white-space: nowrap;
-  background: var(--surface-color);
-  padding: 0.4rem 1rem;
-  border-radius: 20px;
-  border: 1px solid rgba(var(--secondary-rgb), 0.2);
-  backdrop-filter: blur(4px);
+  background: transparent;
+  padding: 0;
+  border: none;
+  backdrop-filter: none;
+  box-shadow: none;
+  text-shadow: 0 0 12px rgba(var(--secondary-rgb), 0.8);
+  transition: all 0.3s ease;
 }
 
 .click-indicator.active {
   color: var(--primary);
-  border-color: rgba(var(--primary-rgb), 0.3);
+  text-shadow: 0 0 15px rgba(var(--primary-rgb), 0.9), 0 0 5px rgba(var(--primary-rgb), 1);
 }
 
 @keyframes gentleBounce {
@@ -894,4 +896,72 @@ input, textarea {
     padding: 0.8rem 1.2rem;
     font-size: 0.9rem;
   }
+}
+
+/* =========================================
+   Utility Classes (Refactoring)
+   ========================================= */
+
+.glass-panel {
+  background: rgba(28, 25, 23, 0.95);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(var(--primary-rgb), 0.3);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.8), 0 0 60px rgba(var(--primary-rgb), 0.15);
+  border-radius: 24px;
+}
+
+.modal-header-text {
+  color: var(--text-color);
+  font-family: 'Comfortaa', cursive;
+  font-weight: 700;
+}
+
+.btn-primary-outline {
+  background: rgba(var(--primary-rgb), 0.2);
+  border: 1px solid var(--primary);
+  color: var(--primary);
+  padding: 0.6rem 1.2rem;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s ease;
+}
+
+.btn-primary-outline:hover {
+  background: rgba(var(--primary-rgb), 0.4);
+}
+
+.card-item {
+  padding: 1.5rem;
+  background: rgba(255,255,255,0.03);
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,0.05);
+  transition: all 0.2s ease;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.card-item:hover {
+  background: rgba(255,255,255,0.06);
+  border-color: rgba(var(--primary-rgb), 0.2);
+}
+
+.btn-icon-danger {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 0.4rem;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.btn-icon-danger:hover {
+  color: #ef4444;
+  background: rgba(239,68,68,0.1);
 }

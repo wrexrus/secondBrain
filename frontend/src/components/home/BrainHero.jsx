@@ -36,7 +36,8 @@ const BrainHero = ({
   setIsGlobalSearchOpen,
   handleCategoryClick,
   handleBrainClick,
-  getIndicatorText
+  getIndicatorText,
+  handleNewCategoryClick
 }) => {
   return (
     <section className="hero-section">
@@ -142,9 +143,54 @@ const BrainHero = ({
           </svg>
         </div>
         
-        <div className="status-indicator">
-          <div className={`status-dot ${isActive ? 'active' : ''}`}></div>
-          <span className="status-text">{getIndicatorText()}</span>
+        <div 
+          style={{
+            position: 'absolute',
+            top: '32%',
+            left: '50%',
+            transform: `translate(-50%, -50%) scale(${isActive ? 1 : 0.8})`,
+            opacity: isActive ? 1 : 0,
+            pointerEvents: isActive ? 'auto' : 'none',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            zIndex: 30,
+            transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)'
+          }}
+        >
+          <button 
+            className="new-category-btn" 
+            onClick={handleNewCategoryClick}
+            style={{ 
+              padding: '0.6rem 1.4rem', 
+              fontSize: '0.9rem', 
+              fontWeight: '700',
+              background: 'var(--primary)',
+              border: '2px solid var(--primary)',
+              color: '#fff',
+              borderRadius: '30px',
+              boxShadow: '0 0 20px rgba(var(--primary-rgb), 0.5)',
+              cursor: 'pointer',
+              transition: 'all 0.3s ease',
+              marginBottom: '10px'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'scale(1.05)';
+              e.currentTarget.style.boxShadow = '0 0 30px rgba(var(--primary-rgb), 0.8)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'scale(1)';
+              e.currentTarget.style.boxShadow = '0 0 20px rgba(var(--primary-rgb), 0.5)';
+            }}
+          >
+            + New Category
+          </button>
+        </div>
+        
+        <div className={`click-indicator ${isActive ? 'active' : ''}`}>
+          <span style={{ opacity: 0.8, letterSpacing: '2px', fontSize: '0.85rem' }}>
+            {getIndicatorText()}
+          </span>
         </div>
 
       </div>

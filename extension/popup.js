@@ -31,6 +31,18 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
+  const withToken = (callback) => {
+    chrome.storage.local.get(['token'], (result) => {
+      if (result.token && !isTokenExpired(result.token)) {
+        callback(result.token);
+      } else if (result.token) {
+        // Token exists but is expired. Clean up storage and show logged out state.
+        chrome.storage.local.remove(['token', 'user']);
+        setLoggedOutState();
+      }
+    });
+  };
+
   const setLoggedOutState = () => {
     loggedOutView.classList.remove('hidden');
     loggedInView.classList.add('hidden');
@@ -135,15 +147,19 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  let currentSaveMode = 'website';
+  let currentImageDataUrl = null;
+
   // Show Save Form
   document.getElementById('save-website-btn').addEventListener('click', () => {
+    currentSaveMode = 'website';
+    document.getElementById('url-group').classList.remove('hidden');
+    document.getElementById('image-preview-group').classList.add('hidden');
     loggedInView.classList.add('hidden');
     saveFormView.classList.remove('hidden');
 
-    chrome.storage.local.get(['token'], (result) => {
-      if (result.token) {
-        fetchMetadataForDropdown(result.token);
-      }
+    withToken((token) => {
+      fetchMetadataForDropdown(token);
     });
 
     // Auto-fill the URL of the current active tab
@@ -179,22 +195,32 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    console.log("Saving Website Data:", { url, category, subCategory, content });
-    
+    if (currentSaveMode === 'image' && !currentImageDataUrl) {
+      alert("Screenshot not ready yet!");
+      return;
+    }
+
     // Disable button to prevent double submission
     submitSaveBtn.disabled = true;
     submitSaveBtn.textContent = "Saving...";
 
-    chrome.storage.local.get(['token'], (result) => {
-      if (!result.token) return;
+    withToken((token) => {
 
-      fetch('http://localhost:5000/api/websites/save', {
+      let endpoint = 'http://localhost:5000/api/websites/save';
+      let payload = { url, category, subCategory, content };
+
+      if (currentSaveMode === 'image') {
+        endpoint = 'http://localhost:5000/api/websites/save-media';
+        payload.image = currentImageDataUrl;
+      }
+
+      fetch(endpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${result.token}`
+          'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({ url, category, subCategory, content })
+        body: JSON.stringify(payload)
       })
       .then(response => {
         if (!response.ok) throw new Error('Network response was not ok');
@@ -238,8 +264,25 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   document.getElementById('create-image-btn').addEventListener('click', () => {
-    console.log("Create Image clicked");
-    alert("Create Image clicked! (UI Only)");
+    currentSaveMode = 'image';
+    document.getElementById('url-group').classList.add('hidden');
+    document.getElementById('image-preview-group').classList.remove('hidden');
+    loggedInView.classList.add('hidden');
+    saveFormView.classList.remove('hidden');
+
+    withToken((token) => {
+      fetchMetadataForDropdown(token);
+    });
+
+    chrome.tabs.captureVisibleTab(null, { format: 'png' }, (dataUrl) => {
+      if (chrome.runtime.lastError) {
+        console.error(chrome.runtime.lastError);
+        alert("Failed to capture screen. Missing activeTab permission?");
+        return;
+      }
+      currentImageDataUrl = dataUrl;
+      document.getElementById('screenshot-preview').src = dataUrl;
+    });
   });
 
   document.getElementById('create-video-btn').addEventListener('click', () => {

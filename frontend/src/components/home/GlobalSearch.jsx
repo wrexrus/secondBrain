@@ -6,16 +6,24 @@ const GlobalSearch = ({ isOpen, onClose, token, categories, onCategoryClick, mod
   const [query, setQuery] = useState('');
   const [results, setResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
+  const [isRendered, setIsRendered] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
     if (!isOpen) {
-      setQuery('');
-      setResults([]);
-      document.body.style.overflow = 'unset';
+      setIsVisible(false);
+      const timer = setTimeout(() => {
+        setIsRendered(false);
+        setQuery('');
+        setResults([]);
+      }, 300);
+      return () => clearTimeout(timer);
     } else {
-      document.body.style.overflow = 'hidden';
+      setIsRendered(true);
+      // Small delay to allow the DOM to mount before triggering transition
+      const timer = setTimeout(() => setIsVisible(true), 10);
+      return () => clearTimeout(timer);
     }
-    return () => { document.body.style.overflow = 'unset'; };
   }, [isOpen]);
 
   useEffect(() => {
@@ -59,7 +67,7 @@ const GlobalSearch = ({ isOpen, onClose, token, categories, onCategoryClick, mod
     }
   };
 
-  if (!isOpen) return null;
+  if (!isRendered) return null;
 
   // Filter local categories that match query
   const matchedCategories = query.trim() === '' ? categories : categories.filter(c => c.toLowerCase().includes(query.toLowerCase()));
@@ -74,9 +82,20 @@ const GlobalSearch = ({ isOpen, onClose, token, categories, onCategoryClick, mod
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
-      paddingTop: '10vh'
+      paddingTop: '10vh',
+      opacity: isVisible ? 1 : 0,
+      transition: 'opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1)'
     }}>
-      <div style={{ width: '90%', maxWidth: '700px', display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+      <div style={{ 
+        width: '90%', 
+        maxWidth: '700px', 
+        display: 'flex', 
+        flexDirection: 'column', 
+        gap: '2rem',
+        opacity: isVisible ? 1 : 0,
+        transform: `translateY(${isVisible ? '0' : '-20px'}) scale(${isVisible ? '1' : '0.98'})`,
+        transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)'
+      }}>
         
         {/* Search Input */}
         <div style={{ position: 'relative' }}>

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 const CreateLinkModal = ({
   setIsCreatingCategory,
@@ -15,25 +15,26 @@ const CreateLinkModal = ({
   setSubCategorySuggestions
 }) => {
   return (
-    <div className="expansion-view" style={{ 
-      position: 'absolute', 
-      top: '50%', 
-      left: '50%', 
-      transform: 'translate(-50%, -50%)',
-      animation: 'fadeIn 0.3s ease-out', 
-      width: '90vw', 
-      maxWidth: '500px', 
-      background: 'rgba(28, 25, 23, 0.95)', 
-      backdropFilter: 'blur(16px)',
-      padding: '2.5rem', 
-      borderRadius: '24px', 
-      border: '1px solid rgba(var(--primary-rgb), 0.3)', 
-      boxShadow: '0 20px 40px rgba(0,0,0,0.8), 0 0 60px rgba(var(--primary-rgb), 0.15)',
-      zIndex: 100 
+    <div style={{
+      position: 'fixed',
+      top: 0, left: 0, right: 0, bottom: 0,
+      background: 'rgba(0,0,0,0.6)',
+      backdropFilter: 'blur(10px)',
+      zIndex: 1000,
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center'
     }}>
+      <div className="expansion-view glass-panel" style={{ 
+        position: 'relative', 
+        animation: 'fadeIn 0.3s ease-out', 
+        width: '90vw', 
+        maxWidth: '500px', 
+        padding: '2.5rem'
+      }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '1rem' }}>
         <h2 style={{ color: 'var(--text-color)', fontSize: '1.8rem', fontFamily: 'Comfortaa, cursive', fontWeight: '700' }}>
-          New Category
+          New Category 
         </h2>
         <button 
           className="modal-close" 
@@ -152,6 +153,7 @@ const CreateLinkModal = ({
           {isLoading ? 'Saving...' : 'Save Record'}
         </button>
       </form>
+      </div>
     </div>
   );
 };
