@@ -2,6 +2,28 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import BASE_URL from '../../config/api';
 
+const HighlightText = ({ text, highlight }) => {
+  if (!text) return null;
+  if (!highlight.trim()) return <span>{text}</span>;
+  
+  const escapeRegExp = (string) => string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const regex = new RegExp(`(\\b${escapeRegExp(highlight)})`, 'gi');
+  const parts = text.toString().split(regex);
+  const matchRegex = new RegExp(`^${escapeRegExp(highlight)}$`, 'i');
+  
+  return (
+    <span>
+      {parts.map((part, i) => 
+        matchRegex.test(part) ? (
+          <span key={i} style={{ background: 'rgba(var(--primary-rgb), 0.5)', color: '#fff', borderRadius: '4px', padding: '0 2px' }}>{part}</span>
+        ) : (
+          <span key={i}>{part}</span>
+        )
+      )}
+    </span>
+  );
+};
+
 const GlobalSearch = ({ isOpen, onClose, token, categories, onCategoryClick, mode = 'global' }) => {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState([]);
@@ -157,7 +179,7 @@ const GlobalSearch = ({ isOpen, onClose, token, categories, onCategoryClick, mod
                     onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(var(--primary-rgb), 0.2)'}
                     onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.05)'}
                   >
-                    {cat}
+                    <HighlightText text={cat} highlight={query} />
                   </button>
                 ))}
               </div>
@@ -200,16 +222,16 @@ const GlobalSearch = ({ isOpen, onClose, token, categories, onCategoryClick, mod
                   >
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                       <span style={{ color: '#fff', fontWeight: 'bold' }}>
-                        {res.category} {res.subCategory && <span style={{ color: 'var(--primary)', fontWeight: 'normal' }}> ❯ {res.subCategory}</span>}
+                        <HighlightText text={res.category} highlight={query} /> {res.subCategory && <span style={{ color: 'var(--primary)', fontWeight: 'normal' }}> ❯ <HighlightText text={res.subCategory} highlight={query} /></span>}
                       </span>
                       <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>{new Date(res.createdAt).toLocaleDateString()}</span>
                     </div>
                     
-                    {res.content && <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem' }}>{res.content}</p>}
+                    {res.content && <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem' }}><HighlightText text={res.content} highlight={query} /></p>}
                     
                     {res.url && (
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(0,0,0,0.2)', padding: '0.8rem 1rem', borderRadius: '8px' }}>
-                        <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem', wordBreak: 'break-all', paddingRight: '1rem' }}>{res.url}</span>
+                        <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem', wordBreak: 'break-all', paddingRight: '1rem' }}><HighlightText text={res.url} highlight={query} /></span>
                         <a 
                           href={res.url} 
                           target="_blank" 

@@ -1,4 +1,17 @@
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
+
+const extractYouTubeId = (url) => {
+  if (!url) return null;
+  const match = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=|shorts\/)|youtu\.be\/)([^"&?\/\s]{11})/i);
+  return match ? match[1] : null;
+};
+
+const extractInstagramId = (url) => {
+  if (!url) return null;
+  const match = url.match(/(?:instagram\.com\/reel\/|instagram\.com\/p\/|instagram\.com\/tv\/)([a-zA-Z0-9_-]+)/i);
+  return match ? match[1] : null;
+};
 
 const CategoryModal = ({
   selectedCategory,
@@ -41,6 +54,26 @@ const CategoryModal = ({
       setEditingSiteId(null);
     }
     setIsUpdating(false);
+  };
+
+  const downloadImage = async (e, imagePath) => {
+    e.stopPropagation();
+    try {
+      const response = await fetch(`http://localhost:5000${imagePath}`);
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = url;
+      a.download = `synapse_image_${Date.now()}.png`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (error) {
+      console.error('Download failed', error);
+      alert('Failed to download image.');
+    }
   };
 
   return (
@@ -251,6 +284,73 @@ const CategoryModal = ({
                       </div>
                     )}
 
+                    {site.type === 'video' && extractYouTubeId(site.url) && (
+                      <div 
+                        style={{ marginTop: '0.5rem', borderRadius: '12px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.1)', cursor: 'pointer', position: 'relative' }}
+                        onClick={() => setViewingSite(site)}
+                        onMouseEnter={(e) => {
+                          const overlay = e.currentTarget.querySelector('.vid-overlay');
+                          if (overlay) overlay.style.background = 'rgba(0,0,0,0.2)';
+                          const playBtn = e.currentTarget.querySelector('.play-btn');
+                          if (playBtn) playBtn.style.transform = 'scale(1.1)';
+                        }}
+                        onMouseLeave={(e) => {
+                          const overlay = e.currentTarget.querySelector('.vid-overlay');
+                          if (overlay) overlay.style.background = 'rgba(0,0,0,0.4)';
+                          const playBtn = e.currentTarget.querySelector('.play-btn');
+                          if (playBtn) playBtn.style.transform = 'scale(1)';
+                        }}
+                      >
+                        <img 
+                          src={`https://img.youtube.com/vi/${extractYouTubeId(site.url)}/maxresdefault.jpg`} 
+                          onError={(e) => {
+                            if (e.target.src.includes('maxresdefault.jpg')) {
+                              e.target.src = `https://img.youtube.com/vi/${extractYouTubeId(site.url)}/hqdefault.jpg`;
+                            }
+                          }}
+                          alt="Video thumbnail" 
+                          style={{ width: '100%', maxHeight: '200px', objectFit: 'cover', background: '#000', display: 'block' }} 
+                        />
+                        <div className="vid-overlay" style={{
+                          position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
+                          background: 'rgba(0,0,0,0.4)',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          transition: 'background 0.2s ease'
+                        }}>
+                          <div className="play-btn" style={{
+                            width: '50px', height: '50px', borderRadius: '50%', background: 'rgba(255,0,0,0.8)',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            transition: 'transform 0.2s ease', boxShadow: '0 4px 15px rgba(0,0,0,0.5)'
+                          }}>
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="#fff" stroke="#fff" strokeWidth="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {site.type === 'video' && !extractYouTubeId(site.url) && extractInstagramId(site.url) && (
+                      <div 
+                        style={{ marginTop: '0.5rem', borderRadius: '12px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.1)', cursor: 'pointer', position: 'relative', background: 'linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%)', height: '160px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                        onClick={() => setViewingSite(site)}
+                        onMouseEnter={(e) => {
+                          const playBtn = e.currentTarget.querySelector('.play-btn');
+                          if (playBtn) playBtn.style.transform = 'scale(1.1)';
+                        }}
+                        onMouseLeave={(e) => {
+                          const playBtn = e.currentTarget.querySelector('.play-btn');
+                          if (playBtn) playBtn.style.transform = 'scale(1)';
+                        }}
+                      >
+                        <div className="play-btn" style={{
+                          width: '50px', height: '50px', borderRadius: '50%', background: 'rgba(255,255,255,0.2)', backdropFilter: 'blur(4px)', border: '1px solid rgba(255,255,255,0.4)',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          transition: 'transform 0.2s ease', boxShadow: '0 4px 15px rgba(0,0,0,0.2)'
+                        }}>
+                          <svg width="24" height="24" viewBox="0 0 24 24" fill="#fff" stroke="#fff" strokeWidth="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                        </div>
+                      </div>
+                    )}
+
                     {site.content && (
                       <p style={{ 
                         color: 'var(--text-color)', 
@@ -338,7 +438,7 @@ const CategoryModal = ({
       </div>
 
       {/* LIGHTBOX OVERLAY */}
-      {expandedImage && (
+      {expandedImage && createPortal(
         <div 
           style={{
             position: 'fixed',
@@ -362,12 +462,8 @@ const CategoryModal = ({
               onClick={(e) => e.stopPropagation()}
             />
             
-            <a 
-              href={`http://localhost:5000${expandedImage}`} 
-              download
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={(e) => e.stopPropagation()}
+            <button 
+              onClick={(e) => downloadImage(e, expandedImage)}
               style={{
                 position: 'absolute',
                 bottom: '-50px',
@@ -377,18 +473,21 @@ const CategoryModal = ({
                 color: 'white',
                 padding: '0.5rem 1.5rem',
                 borderRadius: '20px',
-                textDecoration: 'none',
+                border: 'none',
+                cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '0.5rem',
-                transition: 'background 0.2s ease'
+                transition: 'background 0.2s ease',
+                fontSize: '1rem',
+                fontFamily: 'inherit'
               }}
               onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.2)'}
               onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'}
             >
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
               Download
-            </a>
+            </button>
 
             <button 
               onClick={() => setExpandedImage(null)}
@@ -409,11 +508,12 @@ const CategoryModal = ({
               <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* VIEWING MODAL OVERLAY */}
-      {viewingSite && (
+      {viewingSite && createPortal(
         <div 
           style={{
             position: 'fixed',
@@ -528,6 +628,71 @@ const CategoryModal = ({
                   </div>
                 </div>
 
+                {viewingSite.type === 'video' && extractYouTubeId(viewingSite.url) && (
+                  <div style={{ marginBottom: '2rem', borderRadius: '16px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.1)', aspectRatio: '16/9' }}>
+                    <iframe 
+                      width="100%" 
+                      height="100%" 
+                      src={`https://www.youtube.com/embed/${extractYouTubeId(viewingSite.url)}?autoplay=1`} 
+                      title="YouTube video player" 
+                      frameBorder="0" 
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                      allowFullScreen
+                      style={{ display: 'block' }}
+                    ></iframe>
+                  </div>
+                )}
+
+                {viewingSite.type === 'video' && !extractYouTubeId(viewingSite.url) && extractInstagramId(viewingSite.url) && (
+                  <div style={{ 
+                    marginBottom: '2rem', 
+                    borderRadius: '16px', 
+                    overflow: 'hidden', 
+                    background: 'linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%)', 
+                    padding: '3rem 2rem',
+                    display: 'flex', 
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '1.5rem',
+                    boxShadow: 'inset 0 0 40px rgba(0,0,0,0.2)'
+                  }}>
+                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+                    <div style={{ color: '#fff', fontSize: '1.2rem', fontWeight: '600', textAlign: 'center' }}>
+                      Instagram restricts embedding Reels directly.<br/>
+                      Click below to watch it on the official app.
+                    </div>
+                    <a 
+                      href={viewingSite.url} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      style={{
+                        background: 'rgba(255,255,255,0.2)',
+                        backdropFilter: 'blur(10px)',
+                        color: '#fff',
+                        textDecoration: 'none',
+                        padding: '0.8rem 2rem',
+                        borderRadius: '30px',
+                        fontWeight: '700',
+                        fontSize: '1.1rem',
+                        border: '1px solid rgba(255,255,255,0.3)',
+                        transition: 'all 0.2s ease',
+                        boxShadow: '0 4px 15px rgba(0,0,0,0.2)'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.background = 'rgba(255,255,255,0.3)';
+                        e.currentTarget.style.transform = 'translateY(-2px)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.background = 'rgba(255,255,255,0.2)';
+                        e.currentTarget.style.transform = 'translateY(0)';
+                      }}
+                    >
+                      Watch on Instagram
+                    </a>
+                  </div>
+                )}
+
                 {viewingSite.imagePath && (
                   <div style={{ marginBottom: '2rem', borderRadius: '16px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.1)' }}>
                     <img 
@@ -559,7 +724,8 @@ const CategoryModal = ({
               </>
             )}
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

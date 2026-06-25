@@ -170,6 +170,40 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  // Show Save Form for Video
+  document.getElementById('create-video-btn').addEventListener('click', () => {
+    currentSaveMode = 'video';
+    document.getElementById('url-group').classList.remove('hidden');
+    document.getElementById('image-preview-group').classList.add('hidden');
+    loggedInView.classList.add('hidden');
+    saveFormView.classList.remove('hidden');
+
+    withToken((token) => {
+      fetchMetadataForDropdown(token);
+    });
+
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      if (tabs.length > 0) {
+        saveUrlInput.value = tabs[0].url;
+        
+        // Auto-fill video title for YouTube
+        if (tabs[0].url.includes('youtube.com/watch') || tabs[0].url.includes('youtu.be/') || tabs[0].url.includes('youtube.com/shorts/')) {
+          let title = tabs[0].title;
+          if (title.endsWith(' - YouTube')) {
+            title = title.substring(0, title.length - 10);
+          }
+          document.getElementById('save-content').value = title;
+        } else if (tabs[0].url.includes('instagram.com/')) {
+          let title = tabs[0].title;
+          if (title.endsWith(' - Instagram')) {
+            title = title.substring(0, title.length - 12);
+          }
+          document.getElementById('save-content').value = title;
+        }
+      }
+    });
+  });
+
   // Cancel Save Form
   cancelSaveBtn.addEventListener('click', () => {
     saveFormView.classList.add('hidden');
@@ -208,6 +242,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
       let endpoint = 'http://localhost:5000/api/websites/save';
       let payload = { url, category, subCategory, content };
+      
+      if (currentSaveMode === 'video') {
+        payload.type = 'video';
+      }
 
       if (currentSaveMode === 'image') {
         endpoint = 'http://localhost:5000/api/websites/save-media';
@@ -285,8 +323,4 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  document.getElementById('create-video-btn').addEventListener('click', () => {
-    console.log("Create Video clicked");
-    alert("Create Video clicked! (UI Only)");
-  });
 });

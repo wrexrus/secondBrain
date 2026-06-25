@@ -18,6 +18,11 @@ const websiteSchema = new mongoose.Schema({
     required: true,
     trim: true
   },
+  type: {
+    type: String,
+    enum: ['website', 'image', 'video'],
+    default: 'website'
+  },
   subCategory: {
     type: String,
     default: '',

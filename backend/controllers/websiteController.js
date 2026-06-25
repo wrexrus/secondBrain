@@ -4,7 +4,7 @@ const path = require("path");
 
 const saveWebsite = async (req, res) => {
   try {
-    const { url, category, content, subCategory } = req.body;
+    const { url, category, content, subCategory, type } = req.body;
     
     if (!category) {
       return res.status(400).json({ message: "Category is required" });
@@ -20,7 +20,8 @@ const saveWebsite = async (req, res) => {
     }
 
     let finalContent = content;
-    if (!finalContent && url) {
+    // Don't auto-fetch title if it's a video, the extension will handle it better or we just leave it
+    if (!finalContent && url && type !== 'video') {
       try {
         const fetchRes = await fetch(url, { signal: AbortSignal.timeout(3000) });
         const html = await fetchRes.text();
@@ -38,7 +39,8 @@ const saveWebsite = async (req, res) => {
       url,
       category: finalCategory,
       subCategory: finalSubCategory,
-      content: finalContent
+      content: finalContent,
+      type: type || 'website'
     });
 
     const savedWebsite = await newWebsite.save();
@@ -140,7 +142,12 @@ const searchWebsites = async (req, res) => {
       return res.json([]);
     }
 
-    const regex = new RegExp(query, "i");
+    const escapeRegExp = (string) => {
+      return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
+    };
+    
+    // Use \b to ensure it matches the START of a word, not anywhere inside the word
+    const regex = new RegExp("\\b" + escapeRegExp(query), "i");
 
     const websites = await Website.find({
       user: req.user.id,

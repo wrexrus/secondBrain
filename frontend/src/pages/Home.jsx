@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import axios from 'axios';
 import { isTokenValid } from '../App';
 import Header from '../components/home/Header';
@@ -33,9 +33,13 @@ const DUMMY_CATEGORIES = ["Ideas", "Inspiration", "Tech", "Design", "Fitness", "
 // ==========================================
 
 const Home = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const initialCategory = searchParams.get('category');
+  const initialSubCategory = searchParams.get('sub');
+
   const [isActive, setIsActive] = useState(false);
   const [categories, setCategories] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState(initialCategory || null);
   const [websites, setWebsites] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -44,11 +48,11 @@ const Home = () => {
   const [websiteSuggestions, setWebsiteSuggestions] = useState([]);
   const [metadata, setMetadata] = useState([]);
   const [subCategorySuggestions, setSubCategorySuggestions] = useState([]);
-  const [activeSubCategory, setActiveSubCategory] = useState("All");
+  const [activeSubCategory, setActiveSubCategory] = useState(initialSubCategory || "All");
   
   // Global Search State
   const [isGlobalSearchOpen, setIsGlobalSearchOpen] = useState(false);
-  const [searchMode, setSearchMode] = useState('global'); // 'global' or 'categories'
+  const [searchMode, setSearchMode] = useState('global');
 
   const navigate = useNavigate();
 
@@ -59,6 +63,9 @@ const Home = () => {
   useEffect(() => {
     if (isAuthenticated) {
       fetchCategories();
+      if (initialCategory) {
+        fetchWebsitesByCategory(initialCategory);
+      }
     } else {
       setCategories(DUMMY_CATEGORIES);
     }
@@ -67,12 +74,50 @@ const Home = () => {
       // Check if message is from our content script telling us to refresh categories
       if (event.data && event.data.type === "REFRESH_CATEGORIES") {
         fetchCategories();
+        // The user specifically requested: "brain should be seen at normal state so when user clicks it sees updated version!"
+        setSelectedCategory(null);
+        setIsCreatingCategory(false);
+        setIsGlobalSearchOpen(false);
       }
     };
     
     window.addEventListener("message", handleMessage);
     return () => window.removeEventListener("message", handleMessage);
   }, [isAuthenticated]);
+
+  // Sync selectedCategory and activeSubCategory to the URL so state persists on refresh
+  useEffect(() => {
+    const params = new URLSearchParams(searchParams);
+    let changed = false;
+    
+    if (selectedCategory) {
+      if (params.get('category') !== selectedCategory) {
+        params.set('category', selectedCategory);
+        changed = true;
+      }
+    } else {
+      if (params.has('category')) {
+        params.delete('category');
+        changed = true;
+      }
+    }
+    
+    if (activeSubCategory !== "All") {
+      if (params.get('sub') !== activeSubCategory) {
+        params.set('sub', activeSubCategory);
+        changed = true;
+      }
+    } else {
+      if (params.has('sub')) {
+        params.delete('sub');
+        changed = true;
+      }
+    }
+    
+    if (changed) {
+      setSearchParams(params, { replace: true });
+    }
+  }, [selectedCategory, activeSubCategory, setSearchParams, searchParams]);
 
   // Global search shortcut (Cmd+K or Ctrl+K)
   useEffect(() => {
