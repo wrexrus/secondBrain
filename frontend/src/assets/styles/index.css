@@ -1,21 +1,21 @@
 @import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@500;700&family=Outfit:wght@300;400;500;700&display=swap');
 
 :root {
-  /* Warm Dark Theme Palette */
-  --bg-color: #1c1917; /* stone-900 */
-  --surface-color: rgba(41, 37, 36, 0.8); /* stone-800 with opacity */
-  --text-color: #fafaf9; /* stone-50 */
-  --text-muted: #a8a29e; /* stone-400 */
+  /* Professional Dark Theme Palette */
+  --bg-color: #0F1115;
+  --surface-color: rgba(26, 29, 36, 0.75);
+  --text-color: #EDEDED;
+  --text-muted: #8F94A3;
   
-  /* Warm Accents (Sunset/Coral/Amber) */
-  --primary: #f97316; /* orange-500 */
-  --primary-rgb: 249, 115, 22;
-  --secondary: #fbbf24; /* amber-400 */
-  --secondary-rgb: 251, 191, 36;
+  /* Refined Accents (Indigo/Slate) */
+  --primary: #5E6AD2;
+  --primary-rgb: 94, 106, 210;
+  --secondary: #8BA1F8;
+  --secondary-rgb: 139, 161, 248;
   
-  --glow: rgba(var(--primary-rgb), 0.4);
-  --glow-strong: rgba(var(--primary-rgb), 0.7);
-  --glow-secondary: rgba(var(--secondary-rgb), 0.3);
+  --glow: rgba(var(--primary-rgb), 0.25);
+  --glow-strong: rgba(var(--primary-rgb), 0.5);
+  --glow-secondary: rgba(var(--secondary-rgb), 0.15);
   
   /* Layout constraints */
   --ring-size: 800px;
@@ -40,8 +40,8 @@ body {
   user-select: none; /* Prevent text selection globally */
   cursor: default;   /* Default arrow cursor */
   background-image: 
-    radial-gradient(circle at 15% 50%, rgba(var(--secondary-rgb), 0.05), transparent 40%),
-    radial-gradient(circle at 85% 30%, rgba(var(--primary-rgb), 0.08), transparent 40%);
+    radial-gradient(circle at 15% 50%, rgba(var(--secondary-rgb), 0.03), transparent 40%),
+    radial-gradient(circle at 85% 30%, rgba(var(--primary-rgb), 0.05), transparent 40%);
 }
 
 /* Allow text selection in form elements and modals */
