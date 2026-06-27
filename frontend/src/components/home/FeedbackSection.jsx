@@ -1,22 +1,39 @@
 import React, { useState } from 'react';
-import axios from 'axios';
-import BASE_URL from '../../config/api';
+import emailjs from '@emailjs/browser';
 
 const FeedbackSection = () => {
   const [feedback, setFeedback] = useState({ name: '', email: '', message: '' });
   const [feedbackStatus, setFeedbackStatus] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleFeedbackSubmit = async (e) => {
     e.preventDefault();
     setFeedbackStatus('Submitting...');
+    setIsSubmitting(true);
+    
     try {
-      await axios.post(`${BASE_URL}/api/feedback/submit`, feedback);
+      // Setup your EmailJS keys in frontend/.env
+      const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID || 'YOUR_SERVICE_ID';
+      const templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID || 'YOUR_TEMPLATE_ID';
+      const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY || 'YOUR_PUBLIC_KEY';
+
+      const templateParams = {
+        from_name: feedback.name,
+        from_email: feedback.email || 'No email provided',
+        message: feedback.message,
+      };
+
+      await emailjs.send(serviceId, templateId, templateParams, publicKey);
+      
       setFeedbackStatus('Success! Thank you for the suggestion.');
       setFeedback({ name: '', email: '', message: '' });
       setTimeout(() => setFeedbackStatus(''), 3000);
     } catch (err) {
-      setFeedbackStatus('Error submitting feedback. Please try again.');
+      console.error("EmailJS Error:", err);
+      setFeedbackStatus('Error submitting feedback. Please try again or check API keys.');
       setTimeout(() => setFeedbackStatus(''), 3000);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -38,8 +55,7 @@ const FeedbackSection = () => {
           <input 
             type="email" 
             className="feedback-input" 
-            placeholder="Your Email" 
-            required 
+            placeholder="Your Email (Optional)" 
             value={feedback.email}
             onChange={(e) => setFeedback({...feedback, email: e.target.value})}
           />
@@ -52,8 +68,8 @@ const FeedbackSection = () => {
             onChange={(e) => setFeedback({...feedback, message: e.target.value})}
             style={{ resize: 'vertical' }}
           ></textarea>
-          <button type="submit" className="btn btn-primary" style={{ justifyContent: 'center', marginTop: '1rem' }}>
-            Send Suggestion
+          <button type="submit" className="btn btn-primary" disabled={isSubmitting} style={{ justifyContent: 'center', marginTop: '1rem', opacity: isSubmitting ? 0.7 : 1 }}>
+            {isSubmitting ? 'Sending...' : 'Send Suggestion'}
           </button>
           {feedbackStatus && (
             <p style={{ textAlign: 'center', color: feedbackStatus.includes('Error') ? '#ef4444' : '#4ade80', fontSize: '0.9rem', marginTop: '0.5rem' }}>
