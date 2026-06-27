@@ -24,4 +24,7 @@ dist-ssr
 *.sw?
 pass.txt
 
+# Environment Variables
 .env
+.env.*
+!.env.example
