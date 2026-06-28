@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
+import toast from 'react-hot-toast';
 
 const extractYouTubeId = (url) => {
   if (!url) return null;
@@ -29,8 +30,21 @@ const CategoryModal = ({
   const [editingSiteId, setEditingSiteId] = useState(null);
   const [viewingSite, setViewingSite] = useState(null);
   const [isEditingView, setIsEditingView] = useState(false);
-  const [editFormData, setEditFormData] = useState({ url: '', content: '', category: '', subCategory: '' });
+  const [editFormData, setEditFormData] = useState({ url: '', content: '', category: '', subCategory: '', image: null, imagePreview: null });
   const [isUpdating, setIsUpdating] = useState(false);
+
+  const handleEditImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setEditFormData(prev => ({ ...prev, image: reader.result, imagePreview: reader.result }));
+      };
+      reader.readAsDataURL(file);
+    } else {
+      setEditFormData(prev => ({ ...prev, image: null, imagePreview: null }));
+    }
+  };
 
   const startEdit = (site) => {
     setEditingSiteId(site._id);
@@ -38,17 +52,19 @@ const CategoryModal = ({
       url: site.url || '',
       content: site.content || '',
       category: site.category || '',
-      subCategory: site.subCategory || ''
+      subCategory: site.subCategory || '',
+      image: null,
+      imagePreview: null
     });
   };
 
   const handleEditSubmit = async (e, id) => {
     e.preventDefault();
     setIsUpdating(true);
-    const success = await handleUpdateWebsite(id, editFormData);
-    if (success) {
+    const result = await handleUpdateWebsite(id, editFormData);
+    if (result && result.success) {
       if (isEditingView && viewingSite && viewingSite._id === id) {
-        setViewingSite({ ...viewingSite, ...editFormData });
+        setViewingSite(result.site);
         setIsEditingView(false);
       }
       setEditingSiteId(null);
@@ -70,9 +86,11 @@ const CategoryModal = ({
       a.click();
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      toast.success('Image downloaded successfully!');
     } catch (error) {
-      console.error('Download failed', error);
-      alert('Failed to download image.');
+      console.error('Error downloading image:', error);
+      toast.error('Failed to download image.');
     }
   };
 
@@ -218,6 +236,31 @@ const CategoryModal = ({
                       style={{ resize: 'vertical' }}
                       rows="3"
                     />
+
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                      <label style={{ color: 'var(--text-muted)', fontSize: '0.8rem', fontWeight: '500' }}>
+                        Update Image (Optional)
+                      </label>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', width: '100%' }}>
+                        <label className="btn btn-outline" style={{ cursor: 'pointer', padding: '0.4rem 0.8rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', margin: 0, width: '100%', boxSizing: 'border-box', fontSize: '0.9rem' }}>
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                          Upload New Image
+                          <input type="file" accept="image/*" onChange={handleEditImageChange} style={{ display: 'none' }} />
+                        </label>
+                        {editFormData.imagePreview && (
+                          <div style={{ position: 'relative', width: '40px', height: '40px', borderRadius: '6px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.2)' }}>
+                            <img src={editFormData.imagePreview} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                            <button 
+                              type="button"
+                              onClick={() => setEditFormData(prev => ({ ...prev, image: null, imagePreview: null }))}
+                              style={{ position: 'absolute', top: 0, right: 0, background: 'rgba(0,0,0,0.7)', color: 'white', border: 'none', cursor: 'pointer', width: '16px', height: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px' }}
+                            >
+                              ✕
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
 
                     <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', marginTop: '0.5rem' }}>
                       <button type="button" onClick={() => setEditingSiteId(null)} className="btn" style={{ background: 'transparent', color: 'var(--text-muted)' }}>
@@ -569,6 +612,31 @@ const CategoryModal = ({
                   style={{ resize: 'vertical', fontSize: '1.2rem', padding: '1rem' }}
                   rows="6"
                 />
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                  <label style={{ color: 'var(--text-muted)', fontSize: '0.9rem', fontWeight: '500' }}>
+                    Update Image (Optional)
+                  </label>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', width: '100%' }}>
+                    <label className="btn btn-outline" style={{ cursor: 'pointer', padding: '0.8rem 1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', margin: 0, width: '100%', boxSizing: 'border-box', fontSize: '1rem' }}>
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                      Upload New Image
+                      <input type="file" accept="image/*" onChange={handleEditImageChange} style={{ display: 'none' }} />
+                    </label>
+                    {editFormData.imagePreview && (
+                      <div style={{ position: 'relative', width: '50px', height: '50px', borderRadius: '8px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.2)' }}>
+                        <img src={editFormData.imagePreview} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        <button 
+                          type="button"
+                          onClick={() => setEditFormData(prev => ({ ...prev, image: null, imagePreview: null }))}
+                          style={{ position: 'absolute', top: 0, right: 0, background: 'rgba(0,0,0,0.7)', color: 'white', border: 'none', cursor: 'pointer', width: '20px', height: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px' }}
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
 
                 <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', marginTop: '1rem' }}>
                   <button type="button" onClick={() => { setIsEditingView(false); setEditingSiteId(null); }} className="btn" style={{ background: 'transparent', color: 'var(--text-muted)' }}>

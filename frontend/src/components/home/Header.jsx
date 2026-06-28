@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import UserProfile from '../layout/UserProfile'; // Assuming UserProfile is in layout based on previous knowledge or I will fix it if wrong
 
 const Header = ({ isAuthenticated, setSearchMode, setIsGlobalSearchOpen }) => {
@@ -15,7 +16,7 @@ const Header = ({ isAuthenticated, setSearchMode, setIsGlobalSearchOpen }) => {
               setSearchMode('global');
               setIsGlobalSearchOpen(true);
             }
-            else alert("LogIn to use Global Search!");
+            else toast.error("Log in to use Global Search!");
           }}
           style={{
             background: 'transparent',

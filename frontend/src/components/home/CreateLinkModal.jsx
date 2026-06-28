@@ -12,8 +12,25 @@ const CreateLinkModal = ({
   setWebsiteSuggestions,
   handleSubCategoryInputChange,
   subCategorySuggestions,
-  setSubCategorySuggestions
+  setSubCategorySuggestions,
+  imagePreview,
+  setImagePreview,
+  setImageBase64
 }) => {
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result);
+        setImageBase64(reader.result);
+      };
+      reader.readAsDataURL(file);
+    } else {
+      setImagePreview(null);
+      setImageBase64(null);
+    }
+  };
   return (
     <div style={{
       position: 'fixed',
@@ -41,6 +58,8 @@ const CreateLinkModal = ({
           onClick={() => {
             setIsCreatingCategory(false);
             setNewWebsite({ category: '', subCategory: '', url: '', content: '' });
+            setImagePreview(null);
+            setImageBase64(null);
           }}
           style={{ position: 'relative', top: '0', right: '0' }}
         >×</button>
@@ -148,6 +167,31 @@ const CreateLinkModal = ({
           value={newWebsite.content}
           onChange={(e) => setNewWebsite({ ...newWebsite, content: e.target.value })}
         ></textarea>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <label style={{ color: 'var(--text-muted)', fontSize: '0.9rem', fontWeight: '500' }}>
+            Attach Image (Optional)
+          </label>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', width: '100%' }}>
+            <label className="btn btn-outline" style={{ cursor: 'pointer', padding: '0.5rem 1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', margin: 0, width: '100%', boxSizing: 'border-box' }}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+              Upload Image
+              <input type="file" accept="image/*" onChange={handleImageChange} style={{ display: 'none' }} />
+            </label>
+            {imagePreview && (
+              <div style={{ position: 'relative', width: '50px', height: '50px', borderRadius: '8px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.2)' }}>
+                <img src={imagePreview} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <button 
+                  type="button"
+                  onClick={() => { setImagePreview(null); setImageBase64(null); }}
+                  style={{ position: 'absolute', top: 0, right: 0, background: 'rgba(0,0,0,0.7)', color: 'white', border: 'none', cursor: 'pointer', width: '20px', height: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px' }}
+                >
+                  ✕
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
 
         <button type="submit" className="btn btn-primary" style={{ justifyContent: 'center', marginTop: '0.5rem' }} disabled={isLoading}>
           {isLoading ? 'Saving...' : 'Save Record'}

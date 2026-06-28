@@ -195,7 +195,7 @@ const deleteWebsite = async (req, res) => {
 
 const updateWebsite = async (req, res) => {
   try {
-    const { url, category, subCategory, content } = req.body;
+    const { url, category, subCategory, content, image } = req.body;
     let updateFields = { url, content };
 
     if (category) {
@@ -209,10 +209,23 @@ const updateWebsite = async (req, res) => {
       }
     }
 
+    if (image) {
+      const matches = image.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
+      if (matches && matches.length === 3) {
+        const imageBuffer = Buffer.from(matches[2], 'base64');
+        const filename = `screenshot-${Date.now()}-${Math.floor(Math.random() * 1000)}.png`;
+        const uploadDir = path.join(__dirname, '..', 'uploads');
+        const fullPath = path.join(uploadDir, filename);
+        
+        fs.writeFileSync(fullPath, imageBuffer);
+        updateFields.imagePath = `/uploads/${filename}`;
+      }
+    }
+
     const website = await Website.findOneAndUpdate(
       { _id: req.params.id, user: req.user.id },
       { $set: updateFields },
-      { new: true }
+      { returnDocument: 'after' }
     );
 
     if (!website) {

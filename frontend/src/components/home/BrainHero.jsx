@@ -1,4 +1,5 @@
 import React from 'react';
+import toast from 'react-hot-toast';
 
 const BRAIN_NODES = [
   { id: 1, x: 200, y: 50, r: 8 },
@@ -73,9 +74,9 @@ const BrainHero = ({
                         setSearchMode('categories');
                         setIsGlobalSearchOpen(true);
                       }
-                      else alert("LogIn to use Global Search!");
+                      else toast.error("Log in to use Global Search!");
                     } else {
-                      isAuthenticated ? handleCategoryClick(name) : alert("Sign up to view inside this category!");
+                      isAuthenticated ? handleCategoryClick(name) : toast.error("Sign up to view inside this category!");
                     }
                   }}
                   style={{

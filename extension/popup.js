@@ -1,4 +1,40 @@
 document.addEventListener('DOMContentLoaded', () => {
+  // Custom Toast Function for the Extension
+  const showToast = (message, isError = false) => {
+    const toast = document.createElement('div');
+    toast.textContent = message;
+    toast.style.position = 'absolute';
+    toast.style.top = '10px';
+    toast.style.left = '50%';
+    toast.style.transform = 'translateX(-50%) translateY(-20px)';
+    toast.style.background = isError ? 'rgba(239, 68, 68, 0.9)' : 'rgba(74, 222, 128, 0.9)';
+    toast.style.color = '#fff';
+    toast.style.padding = '8px 16px';
+    toast.style.borderRadius = '20px';
+    toast.style.fontSize = '0.85rem';
+    toast.style.fontWeight = '600';
+    toast.style.boxShadow = '0 4px 15px rgba(0,0,0,0.3)';
+    toast.style.opacity = '0';
+    toast.style.transition = 'all 0.3s ease';
+    toast.style.zIndex = '1000';
+    toast.style.pointerEvents = 'none';
+    
+    document.body.appendChild(toast);
+    
+    // Animate in
+    setTimeout(() => {
+      toast.style.opacity = '1';
+      toast.style.transform = 'translateX(-50%) translateY(0)';
+    }, 10);
+    
+    // Animate out and remove
+    setTimeout(() => {
+      toast.style.opacity = '0';
+      toast.style.transform = 'translateX(-50%) translateY(-20px)';
+      setTimeout(() => document.body.removeChild(toast), 300);
+    }, 2500);
+  };
+
   const createSaveBtn = document.getElementById('create-save-btn');
   const subOptions = document.getElementById('sub-options');
   const chevron = createSaveBtn.querySelector('.chevron');
@@ -230,7 +266,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (currentSaveMode === 'image' && !currentImageDataUrl) {
-      alert("Screenshot not ready yet!");
+      showToast("Screenshot not ready yet!", true);
       return;
     }
 
@@ -315,7 +351,7 @@ document.addEventListener('DOMContentLoaded', () => {
     chrome.tabs.captureVisibleTab(null, { format: 'png' }, (dataUrl) => {
       if (chrome.runtime.lastError) {
         console.error(chrome.runtime.lastError);
-        alert("Failed to capture screen. Missing activeTab permission?");
+        showToast("Failed to capture screen.", true);
         return;
       }
       currentImageDataUrl = dataUrl;

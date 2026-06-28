@@ -4,6 +4,7 @@ import Home from './pages/Home';
 import Doodle from './pages/Doodle';
 import Login from './pages/auth/Login';
 import Signup from './pages/auth/Signup';
+import { Toaster } from 'react-hot-toast';
 import './assets/styles/index.css';
 
 export const isTokenValid = (token) => {
@@ -46,12 +47,38 @@ const App = () => {
   }, []);
 
   return (
-    <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="/doodle" element={<Doodle />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/signup" element={<Signup />} />
-    </Routes>
+    <>
+      <Toaster 
+        position="bottom-right"
+        toastOptions={{
+          style: {
+            background: 'var(--surface-color)',
+            color: 'var(--text-color)',
+            backdropFilter: 'blur(10px)',
+            border: '1px solid rgba(255,255,255,0.1)',
+            borderRadius: '12px',
+          },
+          success: {
+            iconTheme: {
+              primary: '#4ade80',
+              secondary: '#fff',
+            },
+          },
+          error: {
+            iconTheme: {
+              primary: '#ef4444',
+              secondary: '#fff',
+            },
+          },
+        }}
+      />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/doodle" element={<Doodle />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+      </Routes>
+    </>
   );
 };
 

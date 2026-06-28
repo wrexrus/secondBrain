@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import axios from 'axios';
+import toast from 'react-hot-toast';
 import { isTokenValid } from '../App';
 import Header from '../components/home/Header';
 import BrainHero from '../components/home/BrainHero';
@@ -17,7 +18,8 @@ import {
   fetchWebsitesByCategoryApi, 
   deleteWebsiteApi, 
   saveWebsiteApi,
-  updateWebsiteApi
+  updateWebsiteApi,
+  saveMediaApi
 } from '../services/api';
 import BASE_URL from '../config/api';
 import '../assets/styles/index.css';
@@ -45,6 +47,8 @@ const Home = () => {
 
   const [isCreatingCategory, setIsCreatingCategory] = useState(false);
   const [newWebsite, setNewWebsite] = useState({ category: '', subCategory: '', url: '', content: '' });
+  const [imageBase64, setImageBase64] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
   const [websiteSuggestions, setWebsiteSuggestions] = useState([]);
   const [metadata, setMetadata] = useState([]);
   const [subCategorySuggestions, setSubCategorySuggestions] = useState([]);
@@ -128,7 +132,7 @@ const Home = () => {
           setSearchMode('global');
           setIsGlobalSearchOpen(true);
         } else {
-          alert("LogIn to use Global Search!");
+          toast.error("Log in to use Global Search!");
         }
       }
     };
@@ -198,11 +202,11 @@ const Home = () => {
       if (updatedData.category || updatedData.subCategory !== undefined) {
         fetchCategories();
       }
-      return true; // signal success
+      return { success: true, site: updatedSite };
     } catch (error) {
       console.error("Error updating website", error);
-      alert("Error updating website");
-      return false;
+      toast.error("Error updating website");
+      return { success: false };
     }
   };
 
@@ -224,7 +228,7 @@ const Home = () => {
   const handleNewCategoryClick = (e) => {
     e.stopPropagation();
     if (!isAuthenticated) {
-      alert("LogIn to create new Category!");
+      toast.error("Log in to create new Category!");
       return;
     }
     setIsCreatingCategory(true);
@@ -234,7 +238,11 @@ const Home = () => {
     e.preventDefault();
     setIsLoading(true);
     try {
-      await saveWebsiteApi(token, newWebsite);
+      if (imageBase64) {
+        await saveMediaApi(token, { ...newWebsite, image: imageBase64 });
+      } else {
+        await saveWebsiteApi(token, newWebsite);
+      }
       
       if (selectedCategory === newWebsite.category && newWebsite.subCategory) {
         setActiveSubCategory(newWebsite.subCategory);
@@ -243,9 +251,13 @@ const Home = () => {
       
       setIsCreatingCategory(false);
       setNewWebsite({ category: '', subCategory: '', url: '', content: '' });
+      setImageBase64(null);
+      setImagePreview(null);
       fetchCategories(); 
-    } catch (err) {
-      alert("Error saving category.");
+      toast.success("Category saved successfully!");
+    } catch (error) {
+      console.error("Error saving new category", error);
+      toast.error("Error saving category.");
     } finally {
       setIsLoading(false);
     }
@@ -365,6 +377,9 @@ const Home = () => {
           handleSubCategoryInputChange={handleSubCategoryInputChange}
           subCategorySuggestions={subCategorySuggestions}
           setSubCategorySuggestions={setSubCategorySuggestions}
+          imagePreview={imagePreview}
+          setImagePreview={setImagePreview}
+          setImageBase64={setImageBase64}
         />
       )}
 

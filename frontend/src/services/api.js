@@ -30,6 +30,11 @@ export const saveWebsiteApi = async (token, payload) => {
   return res.data;
 };
 
+export const saveMediaApi = async (token, payload) => {
+  const res = await axios.post(`${BASE_URL}/api/websites/save-media`, payload, getHeaders(token));
+  return res.data;
+};
+
 export const searchWebsitesApi = async (token, query) => {
   const res = await axios.get(`${BASE_URL}/api/websites/search?q=${query}`, getHeaders(token));
   return res.data;
