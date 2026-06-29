@@ -1,11 +1,11 @@
 :root {
-  --bg-color: #1c1917; /* stone-900 */
-  --surface-color: #292524; /* stone-800 */
-  --text-color: #fafaf9; /* stone-50 */
-  --text-muted: #a8a29e; /* stone-400 */
-  --primary: #f97316; /* orange-500 */
-  --primary-rgb: 249, 115, 22;
-  --secondary: #fbbf24; /* amber-400 */
+  --bg-color: #0F1115; 
+  --surface-color: #1A1D24; 
+  --text-color: #EDEDED; 
+  --text-muted: #8F94A3; 
+  --primary: #5E6AD2; 
+  --primary-rgb: 94, 106, 210;
+  --secondary: #8BA1F8; 
 }
 
 body {

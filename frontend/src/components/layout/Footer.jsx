@@ -8,9 +8,9 @@ const Footer = () => {
         <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Your digital second brain.</p>
       </div>
       <div className="footer-links">
-        <a href="#">Twitter</a>
-        <a href="#">Discord</a>
-        <a href="#">Privacy Policy</a>
+        <a target='_blank' href="https://www.linkedin.com/in/rushabhmw/">LinkedIn</a>
+        <a target='_blank' href="mailto:rushabhwagh125@gmail.com">Mail</a>
+        <a href="#">Go to Top</a>
       </div>
     </footer>
   );

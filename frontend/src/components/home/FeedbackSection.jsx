@@ -8,7 +8,7 @@ const FeedbackSection = () => {
 
   const handleFeedbackSubmit = async (e) => {
     e.preventDefault();
-    setFeedbackStatus('Submitting...');
+    setFeedbackStatus('Sending...');
     setIsSubmitting(true);
     
     try {
