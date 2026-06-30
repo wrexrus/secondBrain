@@ -689,6 +689,7 @@ input, textarea {
   font-size: 1.5rem;
   font-weight: 700;
   margin-bottom: 0.5rem;
+  transition: 1s ease;
 }
 
 /* Features Grid */
