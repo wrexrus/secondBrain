@@ -128,7 +128,7 @@ const getMetadata = async (req, res) => {
       subCategories: Array.from(metadataMap[category])
     }));
 
-    res.json(metadataArray);
+    res.json({ metadata: metadataArray, totalCount: websites.length });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error fetching metadata" });

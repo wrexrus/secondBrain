@@ -51,6 +51,7 @@ const Home = () => {
   const [imagePreview, setImagePreview] = useState(null);
   const [websiteSuggestions, setWebsiteSuggestions] = useState([]);
   const [metadata, setMetadata] = useState([]);
+  const [totalWebsites, setTotalWebsites] = useState(0);
   const [subCategorySuggestions, setSubCategorySuggestions] = useState([]);
   const [activeSubCategory, setActiveSubCategory] = useState(initialSubCategory || "All");
   
@@ -157,8 +158,13 @@ const Home = () => {
       const categoriesData = await fetchCategoriesApi(token);
       setCategories(categoriesData);
       
-      const metadataData = await fetchMetadataApi(token);
-      setMetadata(metadataData);
+      const metadataRes = await fetchMetadataApi(token);
+      if (metadataRes && metadataRes.metadata) {
+        setMetadata(metadataRes.metadata);
+        setTotalWebsites(metadataRes.totalCount || 0);
+      } else {
+        setMetadata(metadataRes || []);
+      }
     } catch (error) {
       console.error("Error fetching categories", error);
     }
@@ -234,6 +240,12 @@ const Home = () => {
 
   const handleCreateSubmit = async (e) => {
     e.preventDefault();
+    
+    if (!newWebsite.url?.trim() && !newWebsite.content?.trim() && !imageBase64) {
+      toast.error("Please provide at least a URL, Content, or an Image.");
+      return;
+    }
+
     setIsLoading(true);
     try {
       if (imageBase64) {
@@ -344,6 +356,7 @@ const Home = () => {
         handleBrainClick={handleBrainClick}
         getIndicatorText={getIndicatorText}
         handleNewCategoryClick={handleNewCategoryClick}
+        totalWebsites={totalWebsites}
       />
 
       {selectedCategory && (

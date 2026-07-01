@@ -38,8 +38,22 @@ const BrainHero = ({
   handleCategoryClick,
   handleBrainClick,
   getIndicatorText,
-  handleNewCategoryClick
+  handleNewCategoryClick,
+  totalWebsites = 0
 }) => {
+  // DYNAMIC BRAIN GROWTH ALGORITHM
+  // Cap growth at 50 websites for maximum visual effect.
+  const growthRatio = Math.min(totalWebsites / 50, 1.0);
+  
+  // Base SVG Scale (grows up to 15% larger)
+  const dynamicScale = 1 + (growthRatio * 0.15);
+  
+  // Pulse Animation Speed (goes from 2.5s down to 1s)
+  const animationSpeed = 2.5 - (growthRatio * 1.5);
+  
+  // Glow Intensity for central node
+  const glowIntensity = 4 + (growthRatio * 6); // 4px to 10px
+
   return (
     <section className="hero-section">
       <div className="brain-wrapper">
@@ -111,7 +125,7 @@ const BrainHero = ({
           role="button"
           tabIndex={0}
         >
-          <svg className="brain-svg" viewBox="0 0 400 400">
+          <svg className="brain-svg" viewBox="0 0 400 400" style={{ transform: `scale(${dynamicScale})`, transformOrigin: 'center', transition: 'transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275)' }}>
             {/* Draw Connections */}
             {BRAIN_EDGES.map((edge, index) => {
               const n1 = BRAIN_NODES.find(n => n.id === edge[0]);
@@ -132,15 +146,22 @@ const BrainHero = ({
             })}
             
             {/* Draw Nodes */}
-            {BRAIN_NODES.map((node) => (
+            {BRAIN_NODES.map((node) => {
+              // Increase individual node radius (up to +3px)
+              const dynamicRadius = node.r + (growthRatio * 3);
+              return (
               <circle
                 key={`node-${node.id}`}
                 cx={node.x}
                 cy={node.id === 15 && isActive ? node.y + 10 : node.y}
-                r={isActive ? node.r * 1.15 : node.r}
+                r={isActive ? dynamicRadius * 1.15 : dynamicRadius}
                 className={`node ${node.id === 15 ? 'node-pulse' : ''}`}
+                style={node.id === 15 ? { 
+                  animationDuration: `${animationSpeed}s`, 
+                  filter: `drop-shadow(0 0 ${glowIntensity}px var(--secondary))` 
+                } : {}}
               />
-            ))}
+            )})}
           </svg>
         </div>
         

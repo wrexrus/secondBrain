@@ -98,7 +98,7 @@ body {
 }
 
 .btn-primary:hover {
-  background-color: #ea580c;
+  background-color: rgba(var(--primary-rgb), 0.1);
   transform: translateY(-1px);
 }
 

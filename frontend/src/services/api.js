@@ -5,6 +5,18 @@ const getHeaders = (token) => ({
   headers: { Authorization: `Bearer ${token}` }
 });
 
+axios.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response && error.response.status === 401) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      window.location.href = '/login';
+    }
+    return Promise.reject(error);
+  }
+);
+
 export const fetchCategoriesApi = async (token) => {
   const res = await axios.get(`${BASE_URL}/api/websites/categories`, getHeaders(token));
   return res.data;
