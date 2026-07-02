@@ -1,14 +1,39 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import '../../assets/styles/index.css';
 import axios from "axios";
 import BASE_URL from "../../config/api";
+import { isTokenValid } from '../../App';
+import toast from 'react-hot-toast';
 
 const Login = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState({ text: '', type: '' });
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token && isTokenValid(token)) {
+      // User requested: "it shows a message of 'Session in use' and fallbacks to logged in account of extension"
+      setMessage({ text: "Session in use. Syncing with extension...", type: "success" });
+      const userStr = localStorage.getItem("user");
+      
+      // Force sync to extension
+      window.postMessage(
+          {
+              type: "FROM_WEBSITE",
+              token: token,
+              user: userStr ? JSON.parse(userStr) : null
+          },
+          window.location.origin
+      );
+
+      setTimeout(() => {
+        navigate('/');
+      }, 1500);
+    }
+  }, [navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

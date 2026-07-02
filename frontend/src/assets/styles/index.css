@@ -37,8 +37,8 @@ body {
   display: flex;
   flex-direction: column;
   overflow-x: hidden;
-  user-select: none; /* Prevent text selection globally */
-  cursor: default;   /* Default arrow cursor */
+  /* user-select: none;
+  cursor: default;    */
   background-image: 
     radial-gradient(circle at 15% 50%, rgba(var(--secondary-rgb), 0.03), transparent 40%),
     radial-gradient(circle at 85% 30%, rgba(var(--primary-rgb), 0.05), transparent 40%);

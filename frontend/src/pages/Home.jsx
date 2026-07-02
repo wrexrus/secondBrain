@@ -78,9 +78,11 @@ const Home = () => {
     const handleMessage = (event) => {
       // Check if message is from our content script telling us to refresh categories
       if (event.data && event.data.type === "REFRESH_CATEGORIES") {
-        // User requested: "Whenever we add from add or save from extension - it should trigger our website to refresh itself automatically!"
-        // A full redirect to the origin will cleanly reset the brain and URL params
-        window.location.href = window.location.origin;
+        fetchCategories();
+        setSelectedCategory(null);
+        setIsCreatingCategory(false);
+        setIsGlobalSearchOpen(false);
+        setSearchParams(new URLSearchParams(), { replace: true });
       }
     };
     
