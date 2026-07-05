@@ -32,6 +32,10 @@ const websiteSchema = new mongoose.Schema({
     type: String,
     default: ''
   },
+  isStub: {
+    type: Boolean,
+    default: false
+  },
   createdAt: {
     type: Date,
     default: Date.now

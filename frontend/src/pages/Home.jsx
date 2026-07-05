@@ -17,6 +17,7 @@ import {
   fetchMetadataApi, 
   fetchWebsitesByCategoryApi, 
   deleteWebsiteApi, 
+  deleteCategoryApi,
   saveWebsiteApi,
   updateWebsiteApi,
   saveMediaApi
@@ -190,13 +191,24 @@ const Home = () => {
       // Remove from local state immediately
       setWebsites(prev => prev.filter(site => site._id !== id));
       
-      // If that was the last website in the category, we should refresh the categories
+      // If that was the last website in the category, refresh the categories to fetch the stub
       if (websites.length === 1) {
         fetchCategories();
-        closeExpansion();
       }
     } catch (error) {
       console.error("Error deleting website", error);
+    }
+  };
+
+  const handleDeleteCategory = async (categoryName) => {
+    try {
+      await deleteCategoryApi(token, categoryName);
+      toast.success(`${categoryName} deleted successfully`);
+      fetchCategories();
+      closeExpansion();
+    } catch (error) {
+      console.error("Error deleting category", error);
+      toast.error("Failed to delete category");
     }
   };
 
@@ -243,8 +255,8 @@ const Home = () => {
   const handleCreateSubmit = async (e) => {
     e.preventDefault();
     
-    if (!newWebsite.url?.trim() && !newWebsite.content?.trim() && !imageBase64) {
-      toast.error("Please provide at least a URL, Content, or an Image.");
+    if (!newWebsite.url?.trim() && !newWebsite.content?.trim() && !imageBase64 && !newWebsite.category?.trim()) {
+      toast.error("Please provide at least a Category, URL, Content, or an Image.");
       return;
     }
 
@@ -369,6 +381,7 @@ const Home = () => {
           activeSubCategory={activeSubCategory}
           setActiveSubCategory={setActiveSubCategory}
           handleDeleteWebsite={handleDeleteWebsite}
+          handleDeleteCategory={handleDeleteCategory}
           handleUpdateWebsite={handleUpdateWebsite}
           closeExpansion={closeExpansion}
           setNewWebsite={setNewWebsite}

@@ -34,13 +34,16 @@ const saveWebsite = async (req, res) => {
       }
     }
 
+    const isStub = !url && !finalContent;
+
     const newWebsite = new Website({
       user: req.user.id,
       url,
       category: finalCategory,
       subCategory: finalSubCategory,
       content: finalContent,
-      type: type || 'website'
+      type: type || 'website',
+      isStub
     });
 
     const savedWebsite = await newWebsite.save();
@@ -82,13 +85,16 @@ const saveMedia = async (req, res) => {
       }
     }
 
+    const isStub = !url && !content && !imagePath;
+
     const newWebsite = new Website({
       user: req.user.id,
       url: url || "",
       category: finalCategory,
       subCategory: finalSubCategory,
       content: content || "",
-      imagePath: imagePath
+      imagePath: imagePath,
+      isStub
     });
 
     const savedWebsite = await newWebsite.save();
@@ -170,7 +176,8 @@ const getWebsitesByCategory = async (req, res) => {
   try {
     const websites = await Website.find({ 
       user: req.user.id, 
-      category: { $regex: new RegExp("^" + req.params.category + "$", "i") }
+      category: { $regex: new RegExp("^" + req.params.category + "$", "i") },
+      isStub: { $ne: true }
     }).sort({ createdAt: -1 });
 
     res.json(websites);
@@ -186,6 +193,13 @@ const deleteWebsite = async (req, res) => {
     if (!website) {
       return res.status(404).json({ message: "Website not found or not authorized" });
     }
+    
+    // If that was the very last item in the category, create a stub so the category doesn't vanish
+    const count = await Website.countDocuments({ user: req.user.id, category: website.category });
+    if (count === 0) {
+      await Website.create({ user: req.user.id, category: website.category, isStub: true });
+    }
+
     res.json({ message: "Website removed" });
   } catch (error) {
     console.error(error);
@@ -238,6 +252,26 @@ const updateWebsite = async (req, res) => {
   }
 };
 
+const deleteCategory = async (req, res) => {
+  try {
+    const { category } = req.params;
+    // Delete all websites matching this exact category (case-insensitive) for this user
+    const result = await Website.deleteMany({ 
+      user: req.user.id, 
+      category: { $regex: new RegExp("^" + category + "$", "i") }
+    });
+    
+    if (result.deletedCount === 0) {
+      return res.status(404).json({ message: "Category not found or already empty" });
+    }
+    
+    res.json({ message: "Category and all its contents deleted" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error deleting category" });
+  }
+};
+
 module.exports = {
   saveWebsite,
   saveMedia,
@@ -246,5 +280,6 @@ module.exports = {
   searchWebsites,
   getWebsitesByCategory,
   deleteWebsite,
-  updateWebsite
+  updateWebsite,
+  deleteCategory
 };

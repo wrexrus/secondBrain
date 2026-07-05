@@ -9,7 +9,8 @@ const {
   searchWebsites,
   getWebsitesByCategory,
   deleteWebsite,
-  updateWebsite
+  updateWebsite,
+  deleteCategory
 } = require("../controllers/websiteController");
 
 // Middleware to verify token
@@ -57,5 +58,9 @@ router.delete("/:id", authMiddleware, deleteWebsite);
 // @route   PUT /api/websites/:id
 // @desc    Update a specific website
 router.put("/:id", authMiddleware, updateWebsite);
+
+// @route   DELETE /api/websites/category/:category
+// @desc    Delete all websites in a specific category
+router.delete("/category/:category", authMiddleware, deleteCategory);
 
 module.exports = router;

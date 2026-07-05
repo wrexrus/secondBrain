@@ -37,6 +37,11 @@ export const deleteWebsiteApi = async (token, id) => {
   return res.data;
 };
 
+export const deleteCategoryApi = async (token, categoryName) => {
+  const res = await axios.delete(`${BASE_URL}/api/websites/category/${categoryName}`, getHeaders(token));
+  return res.data;
+};
+
 export const saveWebsiteApi = async (token, payload) => {
   const res = await axios.post(`${BASE_URL}/api/websites/save`, payload, getHeaders(token));
   return res.data;
