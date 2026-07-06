@@ -141,6 +141,13 @@ document.addEventListener('DOMContentLoaded', () => {
     .then(res => res.json())
     .then(data => {
       cachedMetadata = data;
+      // Populate categories immediately
+      categoryDatalist.innerHTML = '';
+      cachedMetadata.forEach(meta => {
+        const option = document.createElement('option');
+        option.value = meta.category;
+        categoryDatalist.appendChild(option);
+      });
     })
     .catch(err => console.error('Error fetching metadata for dropdown:', err));
   };
@@ -150,36 +157,17 @@ document.addEventListener('DOMContentLoaded', () => {
   const subCategoryInput = document.getElementById('save-subcategory');
   const subCategoryDatalist = document.getElementById('subcategory-options');
 
+  // When category changes, populate the subcategory datalist
   categoryInput.addEventListener('input', (e) => {
-    const val = e.target.value.toLowerCase();
-    categoryDatalist.innerHTML = ''; 
-    
-    if (val.length > 0) {
-      cachedMetadata.forEach(meta => {
-        if (meta.category.toLowerCase().startsWith(val)) {
-          const option = document.createElement('option');
-          option.value = meta.category;
-          categoryDatalist.appendChild(option);
-        }
-      });
-    }
-  });
-
-  subCategoryInput.addEventListener('input', (e) => {
-    const val = e.target.value.toLowerCase();
+    const selectedCategory = e.target.value.toLowerCase();
     subCategoryDatalist.innerHTML = ''; 
-    
-    if (val.length > 0 && categoryInput.value) {
-      const catMeta = cachedMetadata.find(m => m.category.toLowerCase() === categoryInput.value.toLowerCase());
-      if (catMeta && catMeta.subCategories) {
-        catMeta.subCategories.forEach(sub => {
-          if (sub.toLowerCase().startsWith(val)) {
-            const option = document.createElement('option');
-            option.value = sub;
-            subCategoryDatalist.appendChild(option);
-          }
-        });
-      }
+    const catMeta = cachedMetadata.find(m => m.category.toLowerCase() === selectedCategory);
+    if (catMeta && catMeta.subCategories) {
+      catMeta.subCategories.forEach(sub => {
+        const option = document.createElement('option');
+        option.value = sub;
+        subCategoryDatalist.appendChild(option);
+      });
     }
   });
 

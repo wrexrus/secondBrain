@@ -66,7 +66,7 @@ const CreateLinkModal = ({
       </div>
       
       <form onSubmit={handleCreateSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-        <div style={{ position: 'relative' }}>
+        <div style={{ position: 'relative', zIndex: 20 }}>
           <input 
             type="text" 
             placeholder="Category Name" 
@@ -89,7 +89,7 @@ const CreateLinkModal = ({
               marginTop: '0.3rem',
               maxHeight: '150px',
               overflowY: 'auto',
-              zIndex: 10
+              zIndex: 100
             }}>
               {websiteSuggestions.map((sug, idx) => (
                 <div 
@@ -109,7 +109,7 @@ const CreateLinkModal = ({
           )}
         </div>
 
-        <div style={{ position: 'relative' }}>
+        <div style={{ position: 'relative', zIndex: 10 }}>
           <input 
             type="text" 
             placeholder="Sub-Category (Optional)" 

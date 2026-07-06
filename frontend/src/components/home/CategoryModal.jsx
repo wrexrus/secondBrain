@@ -5,6 +5,8 @@ import DeleteConfirmModal from './CategoryModalComponents/DeleteConfirmModal';
 import ViewWebsiteModal from './CategoryModalComponents/ViewWebsiteModal';
 import CategoryItemCard from './CategoryModalComponents/CategoryItemCard';
 
+import BASE_URL from '../../config/api';
+
 const CategoryModal = ({
   selectedCategory,
   isLoading,
@@ -67,18 +69,18 @@ const CategoryModal = ({
   const downloadImage = async (e, imagePath) => {
     e.stopPropagation();
     try {
-      const response = await fetch(`http://localhost:5000${imagePath}`);
+      const url = imagePath.startsWith('http') ? imagePath : `${BASE_URL}${imagePath}`;
+      const response = await fetch(url);
       const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
+      const downloadUrl = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.style.display = 'none';
-      a.href = url;
+      a.href = downloadUrl;
       a.download = `synapse_image_${Date.now()}.png`;
       document.body.appendChild(a);
       a.click();
-      window.URL.revokeObjectURL(url);
+      window.URL.revokeObjectURL(downloadUrl);
       document.body.removeChild(a);
-      URL.revokeObjectURL(url);
       toast.success('Image downloaded successfully!');
     } catch (error) {
       console.error('Error downloading image:', error);

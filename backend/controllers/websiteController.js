@@ -1,6 +1,13 @@
 const Website = require("../models/Website");
 const fs = require("fs");
 const path = require("path");
+const cloudinary = require("cloudinary").v2;
+
+cloudinary.config({ 
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME, 
+  api_key: process.env.CLOUDINARY_API_KEY, 
+  api_secret: process.env.CLOUDINARY_API_SECRET 
+});
 
 const saveWebsite = async (req, res) => {
   try {
@@ -73,15 +80,13 @@ const saveMedia = async (req, res) => {
 
     let imagePath = null;
     if (image) {
-      const matches = image.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
-      if (matches && matches.length === 3) {
-        const imageBuffer = Buffer.from(matches[2], 'base64');
-        const filename = `screenshot-${Date.now()}-${Math.floor(Math.random() * 1000)}.png`;
-        const uploadDir = path.join(__dirname, '..', 'uploads');
-        const fullPath = path.join(uploadDir, filename);
-        
-        fs.writeFileSync(fullPath, imageBuffer);
-        imagePath = `/uploads/${filename}`;
+      try {
+        const result = await cloudinary.uploader.upload(image, {
+          folder: "synapse_thumbnails"
+        });
+        imagePath = result.secure_url;
+      } catch (err) {
+        console.error("Cloudinary upload error:", err);
       }
     }
 
@@ -224,15 +229,13 @@ const updateWebsite = async (req, res) => {
     }
 
     if (image) {
-      const matches = image.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
-      if (matches && matches.length === 3) {
-        const imageBuffer = Buffer.from(matches[2], 'base64');
-        const filename = `screenshot-${Date.now()}-${Math.floor(Math.random() * 1000)}.png`;
-        const uploadDir = path.join(__dirname, '..', 'uploads');
-        const fullPath = path.join(uploadDir, filename);
-        
-        fs.writeFileSync(fullPath, imageBuffer);
-        updateFields.imagePath = `/uploads/${filename}`;
+      try {
+        const result = await cloudinary.uploader.upload(image, {
+          folder: "synapse_thumbnails"
+        });
+        updateFields.imagePath = result.secure_url;
+      } catch (err) {
+        console.error("Cloudinary upload error:", err);
       }
     }
 

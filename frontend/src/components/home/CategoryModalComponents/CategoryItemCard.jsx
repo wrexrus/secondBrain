@@ -1,5 +1,6 @@
 import EditWebsiteForm from './EditWebsiteForm';
-import { Trash2, Play } from 'lucide-react';
+import { Trash2, Play, ExternalLink, Edit2, Download, Maximize2 } from 'lucide-react';
+import BASE_URL from '../../../config/api';
 
 const extractYouTubeId = (url) => {
   if (!url) return null;
@@ -134,7 +135,7 @@ const CategoryItemCard = ({
         {site.imagePath && (
           <div style={{ marginTop: '0.5rem', borderRadius: '12px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.1)', cursor: 'zoom-in', position: 'relative' }} onClick={() => setViewingSite(site)}>
             <img 
-              src={`http://localhost:5000${site.imagePath}`} 
+              src={site.imagePath.startsWith('http') ? site.imagePath : `${BASE_URL}${site.imagePath}`} 
               alt="Saved media" 
               style={{ width: '100%', maxHeight: '200px', objectFit: 'cover', background: '#000', display: 'block', transition: 'transform 0.4s ease' }} 
             />

@@ -1,6 +1,7 @@
 import { createPortal } from 'react-dom';
 import { X, Edit2, Download } from 'lucide-react';
 import EditWebsiteForm from './EditWebsiteForm';
+import BASE_URL from '../../../config/api';
 
 const extractYouTubeId = (url) => {
   if (!url) return null;
@@ -216,7 +217,7 @@ const ViewWebsiteModal = ({
           {viewingSite.imagePath && (
             <div style={{ marginBottom: '2rem', borderRadius: '16px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.1)', position: 'relative' }}>
               <img 
-                src={`http://localhost:5000${viewingSite.imagePath}`} 
+                src={viewingSite.imagePath.startsWith('http') ? viewingSite.imagePath : `${BASE_URL}${viewingSite.imagePath}`} 
                 alt="Saved media" 
                 style={{ width: '100%', objectFit: 'contain', background: '#000', display: 'block', maxHeight: '500px' }} 
               />
