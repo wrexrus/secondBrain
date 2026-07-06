@@ -1,7 +1,15 @@
-import React, { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 const TutorialSection = () => {
   const [expandedStep, setExpandedStep] = useState(null);
+
+  useEffect(() => {
+    const handleOpenStep1 = () => {
+      setExpandedStep(2); // Step 1 is index 2 in toggleStep (Save & Tag)
+    };
+    window.addEventListener('openTutorialStep1', handleOpenStep1);
+    return () => window.removeEventListener('openTutorialStep1', handleOpenStep1);
+  }, []);
 
   const toggleStep = (step) => {
     if (expandedStep === step) {
@@ -12,7 +20,7 @@ const TutorialSection = () => {
   };
 
   return (
-    <section className="section-container" style={{ background: 'rgba(0,0,0,0.2)' }}>
+    <section id="how-synapse-works" className="section-container" style={{ background: 'rgba(0,0,0,0.2)' }}>
       <h2 className="section-title">How Synapse Works</h2>
       <div className="tutorial-grid">
         <div className="tutorial-steps">
@@ -98,12 +106,17 @@ const TutorialSection = () => {
             <p style={{ color: 'var(--text-muted)' }}>Open your dashboard and watch your glowing brain expand with your knowledge.</p>
           </div>
         </div>
-        {/* <div className="tutorial-video">
-          <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" style={{ color: 'var(--primary)', opacity: 0.5 }}>
-            <polygon points="5 3 19 12 5 21 5 3"></polygon>
-            <video src=""></video>
-          </svg>
-        </div> */}
+        <div className="tutorial-video" style={{ position: 'relative', borderRadius: '16px', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.5)', border: '1px solid rgba(255,255,255,0.1)', boxShadow: '0 8px 32px rgba(0,0,0,0.3)' }}>
+          <video 
+            src="/src/assets/tutVid.mp4" 
+            controls 
+            preload="metadata"
+            poster="/src/assets/video-thumbnail-placeholder.jpg"
+            style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+          >
+            Your browser does not support the video tag.
+          </video>
+        </div>
       </div>
     </section>
   );

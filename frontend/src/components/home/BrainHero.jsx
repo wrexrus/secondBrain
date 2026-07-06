@@ -1,4 +1,3 @@
-import React from 'react';
 import toast from 'react-hot-toast';
 
 const BRAIN_NODES = [
@@ -57,6 +56,32 @@ const BrainHero = ({
   return (
     <section className="hero-section">
       <div className="brain-wrapper">
+        {!isAuthenticated && categories.length > 0 && isActive && (
+          <div style={{ position: 'absolute', top: '5%', left: '50%', transform: 'translateX(-50%)', background: 'rgba(255,255,255,0.1)', color: 'var(--text-muted)', padding: '4px 12px', borderRadius: '12px', fontSize: '0.8rem', zIndex: 10, backdropFilter: 'blur(4px)' }}>
+            Dummy Categories
+          </div>
+        )}
+        
+        {isAuthenticated && categories.length === 0 && (
+          <div style={{ position: 'absolute', top: '10%', left: '50%', transform: 'translate(-50%, -50%)', display: 'flex', flexDirection: 'column', alignItems: 'center', zIndex: 40 }}>
+            <button 
+              onClick={(e) => {
+                e.stopPropagation();
+                const el = document.getElementById('how-synapse-works');
+                if(el) {
+                  el.scrollIntoView({ behavior: 'smooth' });
+                  window.dispatchEvent(new CustomEvent('openTutorialStep1'));
+                }
+              }}
+              className="btn-primary"
+              style={{ fontSize: '1.2rem', padding: '0.8rem 1.6rem', boxShadow: '0 0 30px rgba(var(--primary-rgb), 0.5)', cursor: 'pointer' }}
+            >
+              Add categories
+            </button>
+            <p style={{ marginTop: '0.8rem', color: 'var(--text-muted)', fontSize: '0.9rem', whiteSpace: 'nowrap' }}>Your brain is empty!</p>
+          </div>
+        )}
+
         {/* Outer Ring */}
         <div className={`categories-ring ${isActive ? 'visible' : ''}`}>
           <svg className="ring-svg" viewBox="0 0 800 800">
