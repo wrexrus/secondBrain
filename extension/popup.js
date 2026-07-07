@@ -140,7 +140,7 @@ document.addEventListener('DOMContentLoaded', () => {
     })
     .then(res => res.json())
     .then(data => {
-      cachedMetadata = data;
+      cachedMetadata = data.metadata || [];
       // Populate categories immediately
       categoryDatalist.innerHTML = '';
       cachedMetadata.forEach(meta => {
@@ -260,7 +260,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Disable button to prevent double submission
     submitSaveBtn.disabled = true;
-    submitSaveBtn.textContent = "Saving...";
+    submitSaveBtn.innerHTML = `
+      <svg class="spinner" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="animation: spin 1s linear infinite; margin-right: 6px; display: inline-block; vertical-align: middle;">
+        <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"></path>
+      </svg>
+      Saving...
+    `;
+    
+    // Add keyframes if not exists
+    if (!document.getElementById('spinner-style')) {
+      const style = document.createElement('style');
+      style.id = 'spinner-style';
+      style.innerHTML = `@keyframes spin { 100% { transform: rotate(360deg); } }`;
+      document.head.appendChild(style);
+    }
 
     withToken((token) => {
 

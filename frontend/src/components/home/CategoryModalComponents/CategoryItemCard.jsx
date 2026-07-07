@@ -171,6 +171,21 @@ const CategoryItemCard = ({
           </p>
         )}
 
+        {!site.url && !site.imagePath && !site.content && site.type !== 'video' && (
+          <p style={{
+            color: 'var(--text-muted)', 
+            fontSize: '0.9rem',
+            fontStyle: 'italic',
+            background: 'rgba(255,255,255,0.02)',
+            padding: '1rem',
+            borderRadius: '8px',
+            borderLeft: '3px solid rgba(255,255,255,0.1)',
+            margin: 0
+          }}>
+            No details provided.
+          </p>
+        )}
+
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '0.5rem', paddingTop: '1rem', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
           <div style={{ display: 'flex', gap: '0.8rem' }}>
             <button 
