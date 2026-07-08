@@ -110,19 +110,18 @@ const TutorialSection = () => {
           <div style={{ padding: '2rem', textAlign: 'center' }}>
             <h4 style={{ color: 'var(--text-muted)', marginBottom: '1rem' }}>Video Tutorial</h4>
             <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>
-              (Your 290MB video file was too large for GitHub. Please upload it to YouTube as 'Unlisted' and paste the embed link here later!)
             </p>
-            {/* 
+            
             <iframe 
               width="100%" 
               height="100%" 
               style={{ aspectRatio: '16/9', borderRadius: '8px', border: 'none' }}
-              src="https://www.youtube.com/embed/YOUR_VIDEO_ID_HERE" 
+              src="https://www.youtube.com/embed/xPPsRg099cE" 
               title="Synapse Tutorial" 
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
               allowFullScreen
             ></iframe> 
-            */}
+           
           </div>
         </div>
       </div>
