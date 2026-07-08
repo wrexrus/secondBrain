@@ -107,15 +107,23 @@ const TutorialSection = () => {
           </div>
         </div>
         <div className="tutorial-video" style={{ position: 'relative', borderRadius: '16px', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.5)', border: '1px solid rgba(255,255,255,0.1)', boxShadow: '0 8px 32px rgba(0,0,0,0.3)' }}>
-          <video 
-            src="/src/assets/tutVid.mp4" 
-            controls 
-            preload="metadata"
-            poster="/src/assets/video-thumbnail-placeholder.jpg"
-            style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-          >
-            Your browser does not support the video tag.
-          </video>
+          <div style={{ padding: '2rem', textAlign: 'center' }}>
+            <h4 style={{ color: 'var(--text-muted)', marginBottom: '1rem' }}>Video Tutorial</h4>
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>
+              (Your 290MB video file was too large for GitHub. Please upload it to YouTube as 'Unlisted' and paste the embed link here later!)
+            </p>
+            {/* 
+            <iframe 
+              width="100%" 
+              height="100%" 
+              style={{ aspectRatio: '16/9', borderRadius: '8px', border: 'none' }}
+              src="https://www.youtube.com/embed/YOUR_VIDEO_ID_HERE" 
+              title="Synapse Tutorial" 
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+              allowFullScreen
+            ></iframe> 
+            */}
+          </div>
         </div>
       </div>
     </section>
