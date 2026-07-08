@@ -115,14 +115,14 @@ document.addEventListener('DOMContentLoaded', () => {
   // Login button click
   document.getElementById('open-login-btn').addEventListener('click', () => {
     // imp: Check if tab is already open to avoid duplicate tabs (UX improvement)
-    chrome.tabs.query({ url: "http://localhost:5173/*" }, (tabs) => {
+    chrome.tabs.query({ url: "https://secondbrain-tfgn.vercel.app/*" }, (tabs) => {
       if (tabs.length > 0) {
         // Tab exists, switch to it and navigate to login
-        chrome.tabs.update(tabs[0].id, { active: true, url: 'http://localhost:5173/login' });
+        chrome.tabs.update(tabs[0].id, { active: true, url: 'https://secondbrain-tfgn.vercel.app/login' });
         chrome.windows.update(tabs[0].windowId, { focused: true });
       } else {
         // Tab does not exist, create a brand new one
-        chrome.tabs.create({ url: 'http://localhost:5173/login' });
+        chrome.tabs.create({ url: 'https://secondbrain-tfgn.vercel.app/login' });
       }
     });
   });
@@ -135,7 +135,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   let cachedMetadata = [];
   const fetchMetadataForDropdown = (token) => {
-    fetch('http://localhost:5000/api/websites/metadata', {
+    fetch('https://secondbrain-tfgn.onrender.com/api/websites/metadata', {
       headers: { 'Authorization': `Bearer ${token}` }
     })
     .then(res => res.json())
@@ -277,7 +277,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     withToken((token) => {
 
-      let endpoint = 'http://localhost:5000/api/websites/save';
+      let endpoint = 'https://secondbrain-tfgn.onrender.com/api/websites/save';
       let payload = { url, category, subCategory, content };
       
       if (currentSaveMode === 'video') {
@@ -285,7 +285,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       if (currentSaveMode === 'image') {
-        endpoint = 'http://localhost:5000/api/websites/save-media';
+        endpoint = 'https://secondbrain-tfgn.onrender.com/api/websites/save-media';
         payload.image = currentImageDataUrl;
       }
 
@@ -317,7 +317,7 @@ document.addEventListener('DOMContentLoaded', () => {
           document.getElementById('save-content').value = "";
 
           // Notify ALL open Synapse React tabs to refresh their categories
-          chrome.tabs.query({ url: "*://localhost:5173/*" }, (tabs) => {
+          chrome.tabs.query({ url: "*://secondbrain-tfgn.vercel.app/*" }, (tabs) => {
             tabs.forEach(tab => {
               chrome.tabs.sendMessage(tab.id, { type: "REFRESH_CATEGORIES" });
             });

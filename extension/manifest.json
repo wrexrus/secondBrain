@@ -7,15 +7,15 @@
     "activeTab"
   ],
   "host_permissions": [
-    "http://localhost:5173/*",
-    "http://localhost:5000/*"
+    "https://secondbrain-tfgn.vercel.app/*",
+    "https://secondbrain-tfgn.onrender.com/*"
   ],
   "background": {
     "service_worker": "background.js"
   },
   "content_scripts": [
     {
-      "matches": ["http://localhost:5173/*"],
+      "matches": ["https://secondbrain-tfgn.vercel.app/*"],
       "js": ["content.js"]
     }
   ],

@@ -1,10 +1,8 @@
 const ALLOWED_ORIGINS = [
-  "http://localhost:5173",
-  "https://your-production-url.com" // REPLACE THIS ON DEPLOYMENT
+  "https://secondbrain-tfgn.vercel.app"
 ];
 
 window.addEventListener("message", (event) => {
-
     // safety check
     if (event.source !== window) return;
 
