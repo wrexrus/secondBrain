@@ -196,34 +196,37 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Show Save Form for Video
   document.getElementById('create-video-btn').addEventListener('click', () => {
-    currentSaveMode = 'video';
-    document.getElementById('url-group').classList.remove('hidden');
-    document.getElementById('image-preview-group').classList.add('hidden');
-    loggedInView.classList.add('hidden');
-    saveFormView.classList.remove('hidden');
-
-    withToken((token) => {
-      fetchMetadataForDropdown(token);
-    });
-
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
       if (tabs.length > 0) {
-        saveUrlInput.value = tabs[0].url;
-        
-        // Auto-fill video title for YouTube
-        if (tabs[0].url.includes('youtube.com/watch') || tabs[0].url.includes('youtu.be/') || tabs[0].url.includes('youtube.com/shorts/')) {
-          let title = tabs[0].title;
-          if (title.endsWith(' - YouTube')) {
-            title = title.substring(0, title.length - 10);
-          }
-          document.getElementById('save-content').value = title;
-        } else if (tabs[0].url.includes('instagram.com/')) {
-          let title = tabs[0].title;
-          if (title.endsWith(' - Instagram')) {
-            title = title.substring(0, title.length - 12);
-          }
-          document.getElementById('save-content').value = title;
+        const url = tabs[0].url;
+        const isYouTube = url.includes('youtube.com/watch') || url.includes('youtu.be/') || url.includes('youtube.com/shorts/');
+        const isInstagram = url.includes('instagram.com/');
+
+        if (!isYouTube && !isInstagram) {
+          showToast("Only supported for Instagram or YouTube!", true);
+          return;
         }
+
+        currentSaveMode = 'video';
+        document.getElementById('url-group').classList.remove('hidden');
+        document.getElementById('image-preview-group').classList.add('hidden');
+        loggedInView.classList.add('hidden');
+        saveFormView.classList.remove('hidden');
+
+        withToken((token) => {
+          fetchMetadataForDropdown(token);
+        });
+
+        saveUrlInput.value = url;
+        
+        // Auto-fill video title
+        let title = tabs[0].title;
+        if (isYouTube && title.endsWith(' - YouTube')) {
+          title = title.substring(0, title.length - 10);
+        } else if (isInstagram && title.endsWith(' - Instagram')) {
+          title = title.substring(0, title.length - 12);
+        }
+        document.getElementById('save-content').value = title;
       }
     });
   });
