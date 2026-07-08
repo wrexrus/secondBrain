@@ -115,14 +115,14 @@ document.addEventListener('DOMContentLoaded', () => {
   // Login button click
   document.getElementById('open-login-btn').addEventListener('click', () => {
     // imp: Check if tab is already open to avoid duplicate tabs (UX improvement)
-    chrome.tabs.query({ url: "https://secondbrain-tfgn.vercel.app/*" }, (tabs) => {
+    chrome.tabs.query({ url: "https://second-brain-phi-liart.vercel.app/*" }, (tabs) => {
       if (tabs.length > 0) {
         // Tab exists, switch to it and navigate to login
-        chrome.tabs.update(tabs[0].id, { active: true, url: 'https://secondbrain-tfgn.vercel.app/login' });
+        chrome.tabs.update(tabs[0].id, { active: true, url: 'https://second-brain-phi-liart.vercel.app/login' });
         chrome.windows.update(tabs[0].windowId, { focused: true });
       } else {
         // Tab does not exist, create a brand new one
-        chrome.tabs.create({ url: 'https://secondbrain-tfgn.vercel.app/login' });
+        chrome.tabs.create({ url: 'https://second-brain-phi-liart.vercel.app/login' });
       }
     });
   });
@@ -317,7 +317,7 @@ document.addEventListener('DOMContentLoaded', () => {
           document.getElementById('save-content').value = "";
 
           // Notify ALL open Synapse React tabs to refresh their categories
-          chrome.tabs.query({ url: "*://secondbrain-tfgn.vercel.app/*" }, (tabs) => {
+          chrome.tabs.query({ url: "*://second-brain-phi-liart.vercel.app/*" }, (tabs) => {
             tabs.forEach(tab => {
               chrome.tabs.sendMessage(tab.id, { type: "REFRESH_CATEGORIES" });
             });

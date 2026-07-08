@@ -7,7 +7,7 @@
     "activeTab"
   ],
   "host_permissions": [
-    "https://secondbrain-tfgn.vercel.app/*",
+    "https://second-brain-phi-liart.vercel.app/*",
     "https://secondbrain-tfgn.onrender.com/*"
   ],
   "background": {
@@ -15,7 +15,7 @@
   },
   "content_scripts": [
     {
-      "matches": ["https://secondbrain-tfgn.vercel.app/*"],
+      "matches": ["https://second-brain-phi-liart.vercel.app/*"],
       "js": ["content.js"]
     }
   ],

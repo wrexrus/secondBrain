@@ -1,5 +1,5 @@
 const ALLOWED_ORIGINS = [
-  "https://secondbrain-tfgn.vercel.app"
+  "https://second-brain-phi-liart.vercel.app"
 ];
 
 window.addEventListener("message", (event) => {
