@@ -6,6 +6,7 @@ import Login from './pages/auth/Login';
 import Signup from './pages/auth/Signup';
 import { Toaster } from 'react-hot-toast';
 import './assets/styles/index.css';
+import { Analytics } from '@vercel/analytics/react';
 
 export const isTokenValid = (token) => {
   if (!token) return false;
@@ -72,6 +73,7 @@ const App = () => {
           },
         }}
       />
+      <Analytics />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/doodle" element={<Doodle />} />
