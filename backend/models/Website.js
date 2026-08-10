@@ -32,6 +32,10 @@ const websiteSchema = new mongoose.Schema({
     type: String,
     default: ''
   },
+  aiEnabled: {
+    type: Boolean,
+    default: false
+  },
   isStub: {
     type: Boolean,
     default: false

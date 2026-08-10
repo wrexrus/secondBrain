@@ -23,7 +23,7 @@ const CategoryModal = ({
   const [editingSiteId, setEditingSiteId] = useState(null);
   const [viewingSite, setViewingSite] = useState(null);
   const [isEditingView, setIsEditingView] = useState(false);
-  const [editFormData, setEditFormData] = useState({ url: '', content: '', category: '', subCategory: '', image: null, imagePreview: null });
+  const [editFormData, setEditFormData] = useState({ url: '', content: '', category: '', subCategory: '', image: null, imagePreview: null, aiEnabled: false });
   const [isUpdating, setIsUpdating] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
@@ -48,7 +48,8 @@ const CategoryModal = ({
       category: site.category || '',
       subCategory: site.subCategory || '',
       image: null,
-      imagePreview: null
+      imagePreview: null,
+      aiEnabled: site.aiEnabled || false   // seed from the DB value
     });
   };
 

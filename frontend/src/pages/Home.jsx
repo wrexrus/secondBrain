@@ -25,15 +25,8 @@ import {
 import BASE_URL from '../config/api';
 import '../assets/styles/index.css';
 
-// ==========================================
-// Constants & Configuration
-// ==========================================
-
 const DUMMY_CATEGORIES = ["Ideas", "Inspiration", "Tech", "Design", "Fitness", "Recipes", "Books", "Travel", "Music", "Art", "Movies", "Gaming", "Coding", "Finance", "News", "Health", "Pets", "DIY", "Sports", "Nature"];
 
-// ==========================================
-// Main Home Component
-// ==========================================
 
 const Home = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -47,7 +40,7 @@ const Home = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const [isCreatingCategory, setIsCreatingCategory] = useState(false);
-  const [newWebsite, setNewWebsite] = useState({ category: '', subCategory: '', url: '', content: '' });
+  const [newWebsite, setNewWebsite] = useState({ category: '', subCategory: '', url: '', content: '', aiEnabled: false });
   const [imageBase64, setImageBase64] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [websiteSuggestions, setWebsiteSuggestions] = useState([]);
@@ -56,13 +49,13 @@ const Home = () => {
   const [subCategorySuggestions, setSubCategorySuggestions] = useState([]);
   const [activeSubCategory, setActiveSubCategory] = useState(initialSubCategory || "All");
   
-  // Global Search State
+  // global Search State
   const [isGlobalSearchOpen, setIsGlobalSearchOpen] = useState(false);
   const [searchMode, setSearchMode] = useState('global');
 
   const navigate = useNavigate();
 
-  // Read auth state from local storage
+  // read auth state from local storage
   const token = localStorage.getItem("token");
   const isAuthenticated = token && isTokenValid(token);  
 
@@ -274,7 +267,7 @@ const Home = () => {
       }
       
       setIsCreatingCategory(false);
-      setNewWebsite({ category: '', subCategory: '', url: '', content: '' });
+      setNewWebsite({ category: '', subCategory: '', url: '', content: '', aiEnabled: false });
       setImageBase64(null);
       setImagePreview(null);
       fetchCategories(); 

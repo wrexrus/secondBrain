@@ -57,7 +57,7 @@ const CreateLinkModal = ({
           className="modal-close" 
           onClick={() => {
             setIsCreatingCategory(false);
-            setNewWebsite({ category: '', subCategory: '', url: '', content: '' });
+            setNewWebsite({ category: '', subCategory: '', url: '', content: '', aiEnabled: false });
             setImagePreview(null);
             setImageBase64(null);
           }}
@@ -191,6 +191,45 @@ const CreateLinkModal = ({
               </div>
             )}
           </div>
+        </div>
+
+        {/* AI Opt-in Toggle */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.8rem 1rem', background: 'rgba(139, 92, 246, 0.08)', borderRadius: '10px', border: '1px solid rgba(139, 92, 246, 0.2)' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
+            <span style={{ color: 'var(--text-color)', fontSize: '0.88rem', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+              <span>✦</span> Allow AI to analyze &amp; index this item
+            </span>
+            <span style={{ color: 'var(--text-muted)', fontSize: '0.75rem' }}
+              title="Lets AI search and summarize this item. Off by default. Only opted-in items are ever sent to an AI model.">
+              Off by default — hover for details
+            </span>
+          </div>
+          {/* Pill toggle — controlled by newWebsite.aiEnabled */}
+          <label style={{ position: 'relative', display: 'inline-block', width: '44px', height: '24px', cursor: 'pointer', flexShrink: 0 }}>
+            <input
+              type="checkbox"
+              checked={newWebsite.aiEnabled}
+              onChange={(e) => setNewWebsite({ ...newWebsite, aiEnabled: e.target.checked })}
+              style={{ opacity: 0, width: 0, height: 0 }}
+            />
+            <span style={{
+              position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
+              background: newWebsite.aiEnabled ? 'linear-gradient(135deg, #8b5cf6, #6366f1)' : 'rgba(255,255,255,0.15)',
+              borderRadius: '24px',
+              transition: 'background 0.3s ease'
+            }}>
+              <span style={{
+                position: 'absolute',
+                top: '3px',
+                left: newWebsite.aiEnabled ? '23px' : '3px',
+                width: '18px', height: '18px',
+                background: '#fff',
+                borderRadius: '50%',
+                transition: 'left 0.3s ease',
+                boxShadow: '0 1px 4px rgba(0,0,0,0.3)'
+              }} />
+            </span>
+          </label>
         </div>
 
         <button type="submit" className="btn-primary" style={{ width: '100%', padding: '1rem', marginTop: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }} disabled={isLoading}>

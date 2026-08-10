@@ -74,6 +74,44 @@ const EditWebsiteForm = ({
         </div>
       </div>
 
+      {/* AI Opt-in Toggle */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.7rem 0.9rem', background: 'rgba(139, 92, 246, 0.08)', borderRadius: '10px', border: '1px solid rgba(139, 92, 246, 0.2)' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.15rem' }}>
+          <span style={{ color: 'var(--text-color)', fontSize: '0.85rem', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+            <span>✦</span> Allow AI to analyze &amp; index this item
+          </span>
+          <span style={{ color: 'var(--text-muted)', fontSize: '0.73rem' }}
+            title="Lets AI search and summarize this item. Off by default. Only opted-in items are ever sent to an AI model.">
+            Off by default — hover for details
+          </span>
+        </div>
+        <label style={{ position: 'relative', display: 'inline-block', width: '44px', height: '24px', cursor: 'pointer', flexShrink: 0 }}>
+          <input
+            type="checkbox"
+            checked={editFormData.aiEnabled || false}
+            onChange={(e) => setEditFormData({ ...editFormData, aiEnabled: e.target.checked })}
+            style={{ opacity: 0, width: 0, height: 0 }}
+          />
+          <span style={{
+            position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
+            background: editFormData.aiEnabled ? 'linear-gradient(135deg, #8b5cf6, #6366f1)' : 'rgba(255,255,255,0.15)',
+            borderRadius: '24px',
+            transition: 'background 0.3s ease'
+          }}>
+            <span style={{
+              position: 'absolute',
+              top: '3px',
+              left: editFormData.aiEnabled ? '23px' : '3px',
+              width: '18px', height: '18px',
+              background: '#fff',
+              borderRadius: '50%',
+              transition: 'left 0.3s ease',
+              boxShadow: '0 1px 4px rgba(0,0,0,0.3)'
+            }} />
+          </span>
+        </label>
+      </div>
+
       <div style={{ display: 'flex', gap: '0.8rem', marginTop: '0.5rem' }}>
         <button 
           type="button" 

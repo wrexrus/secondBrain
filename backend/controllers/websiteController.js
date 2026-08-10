@@ -11,7 +11,7 @@ cloudinary.config({
 
 const saveWebsite = async (req, res) => {
   try {
-    const { url, category, content, subCategory, type } = req.body;
+    const { url, category, content, subCategory, type, aiEnabled } = req.body;
     
     if (!category) {
       return res.status(400).json({ message: "Category is required" });
@@ -50,6 +50,7 @@ const saveWebsite = async (req, res) => {
       subCategory: finalSubCategory,
       content: finalContent,
       type: type || 'website',
+      aiEnabled: aiEnabled === true,   // strictly coerce — only true if explicitly passed as true
       isStub
     });
 
@@ -63,7 +64,7 @@ const saveWebsite = async (req, res) => {
 
 const saveMedia = async (req, res) => {
   try {
-    const { url, category, content, subCategory, image } = req.body;
+    const { url, category, content, subCategory, image, aiEnabled } = req.body;
     
     if (!category) {
       return res.status(400).json({ message: "Category is required" });
@@ -99,6 +100,7 @@ const saveMedia = async (req, res) => {
       subCategory: finalSubCategory,
       content: content || "",
       imagePath: imagePath,
+      aiEnabled: aiEnabled === true,
       isStub
     });
 
@@ -214,8 +216,13 @@ const deleteWebsite = async (req, res) => {
 
 const updateWebsite = async (req, res) => {
   try {
-    const { url, category, subCategory, content, image } = req.body;
+    const { url, category, subCategory, content, image, aiEnabled } = req.body;
     let updateFields = { url, content };
+
+    // Persist aiEnabled when it is explicitly sent in the request
+    if (typeof aiEnabled === 'boolean') {
+      updateFields.aiEnabled = aiEnabled;
+    }
 
     if (category) {
       updateFields.category = category.trim().charAt(0).toUpperCase() + category.trim().slice(1).toLowerCase();
