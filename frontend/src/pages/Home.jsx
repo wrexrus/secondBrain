@@ -12,6 +12,7 @@ import FeaturesSection from '../components/home/FeaturesSection';
 import FeedbackSection from '../components/home/FeedbackSection';
 import Footer from '../components/layout/Footer';
 import GlobalSearch from '../components/home/GlobalSearch';
+import AiTestPanel from '../components/ai/AiTestPanel';
 import { 
   fetchCategoriesApi, 
   fetchMetadataApi, 
@@ -84,7 +85,7 @@ const Home = () => {
     return () => window.removeEventListener("message", handleMessage);
   }, [isAuthenticated]);
 
-  // Sync selectedCategory and activeSubCategory to the URL so state persists on refresh
+  // sync selectedCategory and activeSubCategory to the URL so state persists on refresh
   useEffect(() => {
     const params = new URLSearchParams(searchParams);
     let changed = false;
@@ -118,7 +119,6 @@ const Home = () => {
     }
   }, [selectedCategory, activeSubCategory, setSearchParams, searchParams]);
 
-  // Global search shortcut (Cmd+K or Ctrl+K)
   useEffect(() => {
     const handleKeyDown = (e) => {
       if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
@@ -135,7 +135,6 @@ const Home = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isAuthenticated]);
 
-  // Prevent body scroll when any modal is open
   useEffect(() => {
     if (isGlobalSearchOpen || selectedCategory || isCreatingCategory) {
       document.body.style.overflow = 'hidden';
@@ -143,7 +142,6 @@ const Home = () => {
       document.body.style.overflow = 'auto';
     }
     
-    // Cleanup on unmount
     return () => {
       document.body.style.overflow = 'auto';
     };
@@ -181,10 +179,8 @@ const Home = () => {
   const handleDeleteWebsite = async (id) => {
     try {
       await deleteWebsiteApi(token, id);
-      // Remove from local state immediately
       setWebsites(prev => prev.filter(site => site._id !== id));
       
-      // If that was the last website in the category, refresh the categories to fetch the stub
       if (websites.length === 1) {
         fetchCategories();
       }
@@ -401,6 +397,9 @@ const Home = () => {
           setImageBase64={setImageBase64}
         />
       )}
+
+      {/* Phase 1 test — remove once AskPanel (Phase 4) is built */}
+      {isAuthenticated && <AiTestPanel token={token} />}
 
       <TutorialSection />
       <FeaturesSection />

@@ -2,6 +2,7 @@ const Website = require("../models/Website");
 const fs = require("fs");
 const path = require("path");
 const cloudinary = require("cloudinary").v2;
+const { indexItem, deleteChunksForItem } = require('../services/embeddingService');
 
 cloudinary.config({ 
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME, 
@@ -56,6 +57,13 @@ const saveWebsite = async (req, res) => {
 
     const savedWebsite = await newWebsite.save();
     res.status(201).json(savedWebsite);
+
+    // Fire-and-forget: only index if user opted in AND there is text content.
+    // Not awaited — the HTTP response is already sent above.
+    if (aiEnabled === true && finalContent) {
+      indexItem(savedWebsite._id.toString(), req.user.id, finalContent);
+    }
+
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error saving website" });
@@ -106,6 +114,12 @@ const saveMedia = async (req, res) => {
 
     const savedWebsite = await newWebsite.save();
     res.status(201).json(savedWebsite);
+
+    // Fire-and-forget: index the text content if AI opted in
+    if (aiEnabled === true && content) {
+      indexItem(savedWebsite._id.toString(), req.user.id, content);
+    }
+
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error saving media" });
@@ -256,6 +270,18 @@ const updateWebsite = async (req, res) => {
       return res.status(404).json({ message: "Website not found or not authorized" });
     }
     res.json(website);
+
+    // Fire-and-forget AI indexing AFTER response is sent
+    if (typeof aiEnabled === 'boolean') {
+      if (aiEnabled === false) {
+        // User opted OUT — immediately delete any existing chunks for privacy
+        deleteChunksForItem(website._id.toString());
+      } else if (aiEnabled === true && updateFields.content) {
+        // User opted IN or content changed while opted in — re-index
+        indexItem(website._id.toString(), req.user.id, updateFields.content);
+      }
+    }
+
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error updating website" });
@@ -265,7 +291,6 @@ const updateWebsite = async (req, res) => {
 const deleteCategory = async (req, res) => {
   try {
     const { category } = req.params;
-    // Delete all websites matching this exact category (case-insensitive) for this user
     const result = await Website.deleteMany({ 
       user: req.user.id, 
       category: { $regex: new RegExp("^" + category + "$", "i") }

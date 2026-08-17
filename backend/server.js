@@ -8,6 +8,7 @@ const PORT = process.env.PORT || 5000;
 const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
 const websiteRoutes = require("./routes/websiteRoutes");
+const aiRoutes = require("./routes/aiRoutes");
 
 const app = express();
 const path = require("path");
@@ -53,6 +54,7 @@ mongoose.connect(process.env.MONGO_URI)
 app.use("/api/auth", authRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/websites", websiteRoutes);
+app.use("/api/ai", aiRoutes);
 
 app.get("/",(req,res)=>{
     res.send("Backend running!!");

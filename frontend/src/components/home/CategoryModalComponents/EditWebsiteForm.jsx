@@ -78,11 +78,11 @@ const EditWebsiteForm = ({
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.7rem 0.9rem', background: 'rgba(139, 92, 246, 0.08)', borderRadius: '10px', border: '1px solid rgba(139, 92, 246, 0.2)' }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.15rem' }}>
           <span style={{ color: 'var(--text-color)', fontSize: '0.85rem', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-            <span>✦</span> Allow AI to analyze &amp; index this item
+            Allow AI to analyze &amp; index this item
           </span>
           <span style={{ color: 'var(--text-muted)', fontSize: '0.73rem' }}
             title="Lets AI search and summarize this item. Off by default. Only opted-in items are ever sent to an AI model.">
-            Off by default — hover for details
+            Off by default  
           </span>
         </div>
         <label style={{ position: 'relative', display: 'inline-block', width: '44px', height: '24px', cursor: 'pointer', flexShrink: 0 }}>
