@@ -12,7 +12,7 @@ import FeaturesSection from '../components/home/FeaturesSection';
 import FeedbackSection from '../components/home/FeedbackSection';
 import Footer from '../components/layout/Footer';
 import GlobalSearch from '../components/home/GlobalSearch';
-import AiTestPanel from '../components/ai/AiTestPanel';
+import AskPanel from '../components/ai/AskPanel';
 import { 
   fetchCategoriesApi, 
   fetchMetadataApi, 
@@ -398,8 +398,8 @@ const Home = () => {
         />
       )}
 
-      {/* Phase 1 test — remove once AskPanel (Phase 4) is built */}
-      {isAuthenticated && <AiTestPanel token={token} />}
+      {/* phase 4 — RAG Ask Assistant */}
+      {isAuthenticated && <AskPanel token={token} onCategoryClick={handleCategoryClick} />}
 
       <TutorialSection />
       <FeaturesSection />
